@@ -1,4 +1,3 @@
-// controllers/genre.js
 const Genre = require('../models/genre');
 
 exports.getGenres = async (req, res) => {

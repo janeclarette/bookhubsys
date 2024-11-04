@@ -13,4 +13,3 @@ exports.createUser = async (req, res) => {
     }
 };
 
-// Other CRUD methods like updateUser, deleteUser, getUser can be defined here similarly with admin checks.

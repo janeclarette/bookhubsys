@@ -7,7 +7,7 @@ const uploadImages = async (images) => {
     const uploadPromises = images.map(image => cloudinary.uploader.upload(image.path, {
         folder: 'suppliers' 
     }));
-    return Promise.all(uploadPromises); // Resolve all upload promises
+    return Promise.all(uploadPromises); 
 };
 
 exports.getSuppliers = async (req, res) => {

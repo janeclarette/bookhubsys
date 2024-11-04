@@ -15,7 +15,7 @@ const authenticate = (req, res, next) => {
     }
 };
 
-// Check if User is Admin
+
 const isAdmin = async (req, res, next) => {
     try {
         const user = await User.findById(req.user._id);
