@@ -13,19 +13,26 @@ import UpdateSupplier from './Components/Admin/UpdateSupplier';
 import BookList from './Components/Admin/BookList'; // Import BookList
 import NewBook from './Components/Admin/NewBook'; // Import NewBook
 import UpdateBook from './Components/Admin/UpdateBook'; // Import UpdateBook
-import { AuthProvider } from './context/AuthContext';
+// import { AuthProvider } from './context/AuthContext';
 import Login from './Components/User/Login';
 import Register from './Components/User/Register';
-import ProtectedRoutes from './Components/Route/ProtectedRoutes';
-import Home from './Components/Home'; 
+// import ProtectedRoutes from './Components/Route/ProtectedRoutes';
+// import Home from './Components/Home'; 
+
+import Sidebar from './Components/Admin/Sidebar';
+import Dashboard from './Components/Admin/Dashboard';
 
 import './App.css';
 
 const App = () => {
     return (
         <Router>
+        <div style={{ display: 'flex' }}>
+          <Sidebar />
+          <div style={{ flex: 1, padding: '20px' }}>
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Dashboard />} /> 
+                {/* <Route path="/" element={<Home />} /> */}
                 <Route path="/admin/authors" element={<AuthorList />} />
                 <Route path="/admin/authors/new" element={<NewAuthor />} />
                 <Route path="/admin/authors/update/:id" element={<UpdateAuthor />} />
@@ -40,8 +47,10 @@ const App = () => {
                 <Route path="/admin/books/update/:id" element={<UpdateBook />} /> {/* Route for UpdateBook */}
                 <Route path="/user/login" element={<Login />} />
                 <Route path="/user/register" element={<Register />} />
-                <ProtectedRoute path="/admin" element={<AdminDashboard />} />
+                {/* <ProtectedRoute path="/admin" element={<AdminDashboard />} /> */}
             </Routes>
+            </div>
+            </div>
         </Router>
     );
 };

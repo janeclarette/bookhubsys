@@ -1,6 +1,6 @@
 // src/Components/User/Login.jsx
 import React, { useState, useContext } from 'react';
-import { AuthContext } from "../../context/AuthContext";
+// import { AuthContext } from "../../context/AuthContext";
 import './login.css';  // Import your CSS file
 
 const Login = () => {
