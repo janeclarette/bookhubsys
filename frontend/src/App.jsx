@@ -17,7 +17,7 @@ import UpdateBook from './Components/Admin/UpdateBook'; // Import UpdateBook
 import Login from './Components/User/Login';
 import Register from './Components/User/Register';
 // import ProtectedRoutes from './Components/Route/ProtectedRoutes';
-// import Home from './Components/Home'; 
+import Home from './Components/Home'; 
 
 import Sidebar from './Components/Admin/Sidebar';
 import Dashboard from './Components/Admin/Dashboard';
@@ -28,11 +28,11 @@ const App = () => {
     return (
         <Router>
         <div style={{ display: 'flex' }}>
-          <Sidebar />
+          {/* <Sidebar /> */}
           <div style={{ flex: 1, padding: '20px' }}>
             <Routes>
-                <Route path="/" element={<Dashboard />} /> 
-                {/* <Route path="/" element={<Home />} /> */}
+                {/* <Route path="/" element={<Dashboard />} />  */}
+                <Route path="/" element={<Home />} />
                 <Route path="/admin/authors" element={<AuthorList />} />
                 <Route path="/admin/authors/new" element={<NewAuthor />} />
                 <Route path="/admin/authors/update/:id" element={<UpdateAuthor />} />
