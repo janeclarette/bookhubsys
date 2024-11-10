@@ -1,6 +1,15 @@
 // Components/Admin/UpdateAuthor.jsx
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import {
+  TextField,
+  Button,
+  Box,
+  Typography,
+  IconButton,
+  Grid
+} from '@mui/material';
+import { Delete } from '@mui/icons-material';
 import axios from '../../utils/axiosConfig';
 
 const UpdateAuthor = () => {
@@ -8,7 +17,8 @@ const UpdateAuthor = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
-  const [images, setImages] = useState(null);
+  const [images, setImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
 
   useEffect(() => {
     fetchAuthor();
@@ -16,7 +26,7 @@ const UpdateAuthor = () => {
 
   const fetchAuthor = async () => {
     try {
-      const response = await axios.get(`/authors/${id}`); // Changed to '/authors/${id}'
+      const response = await axios.get(`/authors/${id}`);
       const { name, bio, imagePath } = response.data.author;
       setName(name);
       setBio(bio);
@@ -27,7 +37,11 @@ const UpdateAuthor = () => {
   };
 
   const handleFileChange = (e) => {
-    setImages(e.target.files);
+    setNewImages(e.target.files);
+  };
+
+  const handleDeleteImage = (index) => {
+    setImages((prevImages) => prevImages.filter((_, i) => i !== index));
   };
 
   const updateAuthor = async (e) => {
@@ -35,12 +49,14 @@ const UpdateAuthor = () => {
     const formData = new FormData();
     formData.append('name', name);
     formData.append('bio', bio);
-    if (images) {
-      Array.from(images).forEach(image => formData.append('images', image));
+
+    // Append newly uploaded images
+    if (newImages) {
+      Array.from(newImages).forEach(image => formData.append('images', image));
     }
 
     try {
-      await axios.put(`/authors/${id}`, formData, { // Changed to '/authors/${id}'
+      await axios.put(`/authors/${id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('Author updated successfully!');
@@ -51,22 +67,56 @@ const UpdateAuthor = () => {
   };
 
   return (
-    <form onSubmit={updateAuthor}>
-      <h1>Update Author</h1>
-      <label>
-        Name:
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} required />
-      </label>
-      <label>
-        Bio:
-        <textarea value={bio} onChange={(e) => setBio(e.target.value)} maxLength="1000" />
-      </label>
-      <label>
-        Images:
-        <input type="file" multiple onChange={handleFileChange} />
-      </label>
-      <button type="submit">Update Author</button>
-    </form>
+    <Box component="form" onSubmit={updateAuthor} sx={{ mt: 3 }}>
+      <Typography variant="h5" gutterBottom>Update Author</Typography>
+
+      <TextField
+        label="Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+        fullWidth
+        sx={{ mb: 2 }}
+      />
+      <TextField
+        label="Bio"
+        value={bio}
+        onChange={(e) => setBio(e.target.value)}
+        multiline
+        rows={4}
+        fullWidth
+        sx={{ mb: 2 }}
+        inputProps={{ maxLength: 1000 }}
+      />
+
+      <Typography variant="h6">Existing Images</Typography>
+      <Grid container spacing={2}>
+        {images.map((image, index) => (
+          <Grid item key={index} xs={3}>
+            <Box position="relative">
+              <img src={image} alt={`author-${index}`} width="100%" />
+              <IconButton
+                onClick={() => handleDeleteImage(index)}
+                sx={{ position: 'absolute', top: 0, right: 0, color: 'red' }}
+              >
+                <Delete />
+              </IconButton>
+            </Box>
+          </Grid>
+        ))}
+      </Grid>
+
+      <input
+        type="file"
+        multiple
+        onChange={handleFileChange}
+        style={{ marginTop: '16px' }}
+      />
+
+      <Button variant="contained" type="submit" color="primary" sx={{ mt: 2 }}>
+        Update Author
+      </Button>
+    </Box>
   );
 };
 

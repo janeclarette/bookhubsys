@@ -21,7 +21,7 @@ const NewAuthor = () => {
     }
 
     try {
-      await axios.post('/authors', formData, {  // Changed to '/authors'
+      await axios.post('/authors', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('Author created successfully!');

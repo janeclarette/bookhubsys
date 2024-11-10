@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import { useParams, useNavigate } from 'react-router-dom';
+import { TextField, Button, Typography, Box } from '@mui/material';
 
 const UpdateGenre = () => {
   const { id } = useParams();
@@ -11,7 +12,7 @@ const UpdateGenre = () => {
   useEffect(() => {
     const fetchGenre = async () => {
       try {
-        const response = await axios.get(`/genres/${id}`); // Updated endpoint
+        const response = await axios.get(`/genres/${id}`);
         setName(response.data.genre.name);
       } catch (error) {
         console.error('Error fetching genre:', error);
@@ -23,29 +24,26 @@ const UpdateGenre = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await axios.put(`/genres/${id}`, { name }); // Updated endpoint
-      navigate('/admin/genres'); 
+      await axios.put(`/genres/${id}`, { name });
+      navigate('/admin/genres');
     } catch (error) {
       console.error('Error updating genre:', error);
     }
   };
 
   return (
-    <div>
-      <h1>Update Genre</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Genre Name:
-          <input 
-            type="text" 
-            value={name} 
-            onChange={(e) => setName(e.target.value)} 
-            required 
-          />
-        </label>
-        <button type="submit">Update Genre</button>
-      </form>
-    </div>
+    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Typography variant="h5" gutterBottom>Update Genre</Typography>
+      <TextField
+        label="Genre Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+        fullWidth
+        sx={{ mb: 2 }}
+      />
+      <Button variant="contained" type="submit" color="primary">Update Genre</Button>
+    </Box>
   );
 };
 

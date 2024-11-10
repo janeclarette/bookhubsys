@@ -1,81 +1,116 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
+import MUIDataTable from 'mui-datatables';
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom'; // Assuming you're using react-router
 
 const BookList = () => {
-    const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState([]);
+  const [selectedRows, setSelectedRows] = useState([]);
+  const navigate = useNavigate();
 
-    const fetchBooks = async () => {
-        try {
-            const response = await axios.get('/books');
-            setBooks(response.data.books);
-        } catch (error) {
-            console.error('Error fetching books:', error.response.data);
-        }
-    };
+  const fetchBooks = async () => {
+    try {
+      const response = await axios.get('/books');
+      const books = response.data.books.map(book => ({
+        ...book,
+        authorName: book.authorId ? book.authorId.name : '',
+        genreName: book.genreId ? book.genreId.name : '',
+        supplierName: book.supplierId ? book.supplierId.name : ''
+      }));
+      setBooks(books);
+    } catch (error) {
+      console.error('Error fetching books:', error);
+    }
+  };
 
-    useEffect(() => {
-        fetchBooks();
-    }, []);
+  useEffect(() => {
+    fetchBooks();
+  }, []);
 
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this book?')) {
-            try {
-                await axios.delete(`/books/${id}`);
-                fetchBooks(); // Refresh the book list
-            } catch (error) {
-                console.error('Error deleting book:', error.response.data);
-            }
-        }
-    };
+  const handleBulkDelete = async () => {
+    if (window.confirm('Are you sure you want to delete selected books?')) {
+      try {
+        await Promise.all(
+          selectedRows.map((rowIndex) => axios.delete(`/books/${books[rowIndex]._id}`))
+        );
+        fetchBooks(); // Refresh the book list
+        setSelectedRows([]); // Clear selected rows
+      } catch (error) {
+        console.error('Error deleting books:', error);
+      }
+    }
+  };
 
-    return (
-        <div>
-            <h1>Book List</h1>
-            <Link to="/admin/books/new">Add New Book</Link>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Title</th>
-                        <th>Author</th>
-                        <th>Genre</th>
-                        <th>Publication Date</th> {/* New column for publication date */}
-                        <th>Stock</th> {/* New column for stock */}
-                        <th>Supplier</th> {/* New column for supplier name */}
-                        <th>Images</th> {/* Images column */}
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {books.map((book) => (
-                        <tr key={book._id}>
-                            <td>{book.title}</td>
-                            <td>{book.authorId.name}</td> {/* Display author's name */}
-                            <td>{book.genreId.name}</td> {/* Display genre's name */}
-                            <td>{new Date(book.publicationDate).toLocaleDateString()}</td> {/* Format publication date */}
-                            <td>{book.stock}</td> {/* Display stock level */}
-                            <td>{book.supplierId.name}</td> {/* Display supplier's name */}
-                            <td>
-                                {book.images.map((image, index) => (
-                                    <img 
-                                        key={index} 
-                                        src={image.url} 
-                                        alt={`Book Image ${index + 1}`} 
-                                        width="100" 
-                                        style={{ margin: '5px' }} // Optional styling for spacing
-                                    />
-                                ))}
-                            </td>
-                            <td>
-                                <Link to={`/admin/books/update/${book._id}`}>Edit</Link>
-                                <button onClick={() => handleDelete(book._id)}>Delete</button>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this book?')) {
+      try {
+        await axios.delete(`/books/${id}`);
+        fetchBooks(); // Refresh the book list after deletion
+      } catch (error) {
+        console.error('Error deleting book:', error);
+      }
+    }
+  };
+
+  const columns = [
+    { name: 'title', label: 'Title' },
+    {
+      name: 'publicationDate',
+      label: 'Publication Date',
+      options: {
+        customBodyRender: (value) => new Date(value).toLocaleDateString(),
+      },
+    },
+    { name: '_id', label: 'Actions', options: { customBodyRender: (id) => (
+      <div>
+        <Button variant="contained" color="primary" onClick={() => navigate(`/admin/books/update/${id}`)}>Edit</Button>
+        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
+      </div>
+    )} },
+  ];
+
+  const options = {
+    selectableRows: 'multiple',
+    onRowsSelect: (rowsSelected, allRows) => {
+      setSelectedRows(allRows.map((row) => row.dataIndex));
+    },
+    expandableRows: true,
+    renderExpandableRow: (rowData, rowMeta) => {
+      const book = books[rowMeta.dataIndex];
+      return (
+        <tr>
+          <td colSpan={columns.length}>
+            <div>
+              <strong>Author:</strong> {book.authorName}
+            </div>
+            <div>
+              <strong>Genre:</strong> {book.genreName}
+            </div>
+            <div>
+              <strong>Supplier:</strong> {book.supplierName}
+            </div>
+            <div>
+              <strong>Stock:</strong> {book.stock}
+            </div>
+            <div>
+              <strong>Images:</strong>
+              {book.images.map((image, index) => (
+                <img key={index} src={image.url} alt={`Book Image ${index + 1}`} width="100" style={{ margin: '5px' }} />
+              ))}
+            </div>
+          </td>
+        </tr>
+      );
+    },
+    customToolbarSelect: () => (
+      <Button variant="contained" color="secondary" onClick={handleBulkDelete}>Bulk Delete</Button>
+    ),
+  };
+
+  return (
+    <MUIDataTable title="Book List" data={books} columns={columns} options={options} />
+  );
 };
 
 export default BookList;
