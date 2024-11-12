@@ -1,19 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaList, FaUser, FaBox, FaChevronDown, FaSignOutAlt, FaStar } from 'react-icons/fa';
+import { FaTachometerAlt, FaChevronDown, FaUser, FaBook, FaLayerGroup, FaBox } from 'react-icons/fa';
 import bookhubLogo from '../../assets/img/bookhublogo.png';
 import bookhubIcon from '../../assets/img/bookhubIcon.gif';
 
 const Sidebar = () => {
-  const [showOrdersDropdown, setShowOrdersDropdown] = useState(false);
+  const [showAuthorsDropdown, setShowAuthorsDropdown] = useState(false);
+  const [showGenresDropdown, setShowGenresDropdown] = useState(false);
   const [showBooksDropdown, setShowBooksDropdown] = useState(false);
   const [showSuppliersDropdown, setShowSuppliersDropdown] = useState(false);
 
   const location = useLocation();
-
-  const toggleOrdersDropdown = () => setShowOrdersDropdown(!showOrdersDropdown);
-  const toggleBooksDropdown = () => setShowBooksDropdown(!showBooksDropdown);
-  const toggleSuppliersDropdown = () => setShowSuppliersDropdown(!showSuppliersDropdown);
 
   const navItemStyle = (path) => ({
     display: 'flex',
@@ -35,7 +32,7 @@ const Sidebar = () => {
 
   return (
     <div style={{
-      userSelect:'none',
+      userSelect: 'none',
       position: 'fixed',
       top: 0,
       left: 0,
@@ -50,168 +47,68 @@ const Sidebar = () => {
       boxShadow: '2px 0 5px rgba(0, 0, 0, 0.5)',
     }}>
       <div>
-        {/* Logo and Icon */}
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px' }}>
           <img src={bookhubIcon} alt="Book Hub Icon" style={{ width: '60px', marginLeft: '10px' }} />
           <img src={bookhubLogo} alt="Book Hub Logo" style={{ width: '150px' }} />
         </div>
-        
+
         <nav>
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {/* Dashboard */}
             <li style={{ marginBottom: '20px' }}>
-              <Link
-                to="/"
-                style={navItemStyle('/')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor;
-                  e.currentTarget.style.color = hoverStyle.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = location.pathname === '/' ? '#1b1b3a' : 'transparent';
-                  e.currentTarget.style.color = location.pathname === '/' ? '#ffffff' : '#262222';
-                }}
-              >
-                <FaTachometerAlt style={{ marginRight: '10px' }} />
-                Dashboard
-              </Link>
+              <Link to="/" style={navItemStyle('/')}> <FaTachometerAlt style={{ marginRight: '10px' }} /> Dashboard </Link>
             </li>
 
-            {/* Orders Management with Dropdown */}
+            {/* Authors Management */}
             <li style={{ marginBottom: '20px' }}>
-              <div
-                onClick={toggleOrdersDropdown}
-                style={{ ...navItemStyle('/orders'), cursor: 'pointer' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor;
-                  e.currentTarget.style.color = hoverStyle.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = showOrdersDropdown || location.pathname.includes('/orders') ? '#1b1b3a' : 'transparent';
-                  e.currentTarget.style.color = showOrdersDropdown || location.pathname.includes('/orders') ? '#ffffff' : '#262222';
-                }}
-              >
-                <FaList style={{ marginRight: '10px' }} />
-                Orders Management
-                <FaChevronDown
-                  style={{
-                    marginLeft: 'auto',
-                    color: showOrdersDropdown || location.pathname.includes('/orders') ? '#ffffff' : '#262222'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = hoverStyle.color}
-                  onMouseLeave={(e) => e.currentTarget.style.color = showOrdersDropdown || location.pathname.includes('/orders') ? '#ffffff' : '#262222'}
-                />
+              <div onClick={() => setShowAuthorsDropdown(!showAuthorsDropdown)} style={{ ...navItemStyle('/admin/authors'), cursor: 'pointer' }}>
+                <FaUser style={{ marginRight: '10px' }} /> Authors Management <FaChevronDown style={{ marginLeft: 'auto' }} />
               </div>
-              {showOrdersDropdown && (
+              {showAuthorsDropdown && (
                 <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/orders/new" style={navItemStyle('/orders/new')}>New Orders</Link></li>
-                  <li><Link to="/orders/history" style={navItemStyle('/orders/history')}>Order History</Link></li>
+                  <li><Link to="/admin/authors/new" style={navItemStyle('/admin/authors/new')}>Add New Author</Link></li>
+                  <li><Link to="/admin/authors" style={navItemStyle('/admin/authors')}>Author List</Link></li>
                 </ul>
               )}
             </li>
 
-            {/* Books Management with Dropdown */}
+            {/* Genre Management */}
             <li style={{ marginBottom: '20px' }}>
-              <div
-                onClick={toggleBooksDropdown}
-                style={{ ...navItemStyle('/books'), cursor: 'pointer' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor;
-                  e.currentTarget.style.color = hoverStyle.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = showBooksDropdown || location.pathname.includes('/products') ? '#1b1b3a' : 'transparent';
-                  e.currentTarget.style.color = showBooksDropdown || location.pathname.includes('/products') ? '#ffffff' : '#262222';
-                }}
-              >
-                <FaBox style={{ marginRight: '10px' }} />
-                Books Management
-                <FaChevronDown
-                  style={{
-                    marginLeft: 'auto',
-                    color: showBooksDropdown || location.pathname.includes('/products') ? '#ffffff' : '#262222'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = hoverStyle.color}
-                  onMouseLeave={(e) => e.currentTarget.style.color = showBooksDropdown || location.pathname.includes('/products') ? '#ffffff' : '#262222'}
-                />
+              <div onClick={() => setShowGenresDropdown(!showGenresDropdown)} style={{ ...navItemStyle('/admin/genres'), cursor: 'pointer' }}>
+                <FaLayerGroup style={{ marginRight: '10px' }} /> Genre Management <FaChevronDown style={{ marginLeft: 'auto' }} />
               </div>
-              {showBooksDropdown && (
+              {showGenresDropdown && (
                 <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/products/new" style={navItemStyle('/products/new')}>Add New Book</Link></li>
-                  <li><Link to="/products/catalog" style={navItemStyle('/products/catalog')}>Book Catalog</Link></li>
+                  <li><Link to="/admin/genres/new" style={navItemStyle('/admin/genres/new')}>Add New Genre</Link></li>
+                  <li><Link to="/admin/genres" style={navItemStyle('/admin/genres')}>Genre List</Link></li>
                 </ul>
               )}
             </li>
 
-            {/* Supplier Management with Dropdown */}
+            {/* Supplier Management */}
             <li style={{ marginBottom: '20px' }}>
-              <div
-                onClick={toggleSuppliersDropdown}
-                style={{ ...navItemStyle('/suppliers'), cursor: 'pointer' }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor;
-                  e.currentTarget.style.color = hoverStyle.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = showSuppliersDropdown || location.pathname.includes('/suppliers') ? '#1b1b3a' : 'transparent';
-                  e.currentTarget.style.color = showSuppliersDropdown || location.pathname.includes('/suppliers') ? '#ffffff' : '#262222';
-                }}
-              >
-                <FaUser style={{ marginRight: '10px' }} />
-                Supplier Management
-                <FaChevronDown
-                  style={{
-                    marginLeft: 'auto',
-                    color: showSuppliersDropdown || location.pathname.includes('/suppliers') ? '#ffffff' : '#262222'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = hoverStyle.color}
-                  onMouseLeave={(e) => e.currentTarget.style.color = showSuppliersDropdown || location.pathname.includes('/suppliers') ? '#ffffff' : '#262222'}
-                />
+              <div onClick={() => setShowSuppliersDropdown(!showSuppliersDropdown)} style={{ ...navItemStyle('/admin/suppliers'), cursor: 'pointer' }}>
+                <FaBox style={{ marginRight: '10px' }} /> Supplier Management <FaChevronDown style={{ marginLeft: 'auto' }} />
               </div>
               {showSuppliersDropdown && (
                 <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/suppliers/new" style={navItemStyle('/suppliers/new')}>Add New Supplier</Link></li>
-                  <li><Link to="/suppliers/list" style={navItemStyle('/suppliers/list')}>Supplier List</Link></li>
+                  <li><Link to="/admin/suppliers/new" style={navItemStyle('/admin/suppliers/new')}>Add New Supplier</Link></li>
+                  <li><Link to="/admin/suppliers/list" style={navItemStyle('/admin/suppliers/list')}>Supplier List</Link></li>
                 </ul>
               )}
             </li>
 
-            {/* Reviews */}
+            {/* Book Management */}
             <li style={{ marginBottom: '20px' }}>
-              <Link
-                to="/reviews"
-                style={navItemStyle('/reviews')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor;
-                  e.currentTarget.style.color = hoverStyle.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = location.pathname === '/reviews' ? '#1b1b3a' : 'transparent';
-                  e.currentTarget.style.color = location.pathname === '/reviews' ? '#ffffff' : '#262222';
-                }}
-              >
-                <FaStar style={{ marginRight: '10px' }} />
-                Reviews
-              </Link>
-            </li>
-
-            {/* Logout */}
-            <li style={{ marginBottom: '20px' }}>
-              <Link
-                to="/logout"
-                style={navItemStyle('/logout')}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = hoverStyle.backgroundColor;
-                  e.currentTarget.style.color = hoverStyle.color;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = location.pathname === '/logout' ? '#1b1b3a' : 'transparent';
-                  e.currentTarget.style.color = location.pathname === '/logout' ? '#ffffff' : '#262222';
-                }}
-              >
-                <FaSignOutAlt style={{ marginRight: '10px' }} />
-                Logout
-              </Link>
+              <div onClick={() => setShowBooksDropdown(!showBooksDropdown)} style={{ ...navItemStyle('/admin/books'), cursor: 'pointer' }}>
+                <FaBook style={{ marginRight: '10px' }} /> Book Management <FaChevronDown style={{ marginLeft: 'auto' }} />
+              </div>
+              {showBooksDropdown && (
+                <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
+                  <li><Link to="/admin/books/new" style={navItemStyle('/admin/books/new')}>Add New Book</Link></li>
+                  <li><Link to="/admin/books" style={navItemStyle('/admin/books')}>Book List</Link></li>
+                </ul>
+              )}
             </li>
           </ul>
         </nav>
