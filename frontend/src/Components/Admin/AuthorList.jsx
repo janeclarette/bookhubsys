@@ -1,8 +1,8 @@
-// Components/Admin/AuthorList.jsx
 import React, { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const AuthorList = () => {
   const [authors, setAuthors] = useState([]);
@@ -23,10 +23,8 @@ const AuthorList = () => {
 
   const handleBulkDelete = async () => {
     try {
-      await Promise.all(
-        selectedAuthors.map(id => axios.delete(`/authors/${id}`))
-      );
-      setAuthors(authors.filter(author => !selectedAuthors.includes(author._id)));
+      await Promise.all(selectedAuthors.map((id) => axios.delete(`/authors/${id}`)));
+      setAuthors(authors.filter((author) => !selectedAuthors.includes(author._id)));
       setSelectedAuthors([]);
       alert('Selected authors deleted successfully!');
     } catch (error) {
@@ -95,19 +93,29 @@ const AuthorList = () => {
     },
   };
 
+  // Styles for layout
+  const styles = {
+    container: {
+      display: 'flex',
+      minHeight: '100vh',
+    },
+    content: {
+      flex: 1,
+      padding: '20px',
+    },
+  };
+
   return (
-    <div>
-      <h1>Authors List</h1>
-      <Link to="/admin/authors/new">Add New Author</Link>
-      <MUIDataTable
-        title="Authors"
-        data={authors}
-        columns={columns}
-        options={options}
-      />
-      {selectedAuthors.length > 0 && (
-        <button onClick={handleBulkDelete}>Delete Selected</button>
-      )}
+    <div style={styles.container}>
+      <Sidebar /> {/* Sidebar for navigation */}
+      <main style={styles.content}>
+        <h1>Authors List</h1>
+        <Link to="/admin/authors/new">Add New Author</Link>
+        <MUIDataTable title="Authors" data={authors} columns={columns} options={options} />
+        {selectedAuthors.length > 0 && (
+          <button onClick={handleBulkDelete}>Delete Selected</button>
+        )}
+      </main>
     </div>
   );
 };

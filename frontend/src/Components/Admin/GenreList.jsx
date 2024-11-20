@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const GenreList = () => {
   const [genres, setGenres] = useState([]);
@@ -45,10 +46,12 @@ const GenreList = () => {
       label: 'Actions',
       options: {
         customBodyRender: (value) => (
-          <>
-            <Link to={`/admin/genres/update/${value}`}>Edit</Link>
+          <div>
+            <Link to={`/admin/genres/update/${value}`} style={{ marginRight: '10px' }}>
+              Edit
+            </Link>
             <button onClick={() => deleteGenre(value)}>Delete</button>
-          </>
+          </div>
         ),
       },
     },
@@ -69,16 +72,31 @@ const GenreList = () => {
     ),
   };
 
+  // Layout styles
+  const styles = {
+    container: {
+      display: 'flex',
+      minHeight: '100vh',
+    },
+    content: {
+      flex: 1,
+      padding: '20px',
+    },
+  };
+
   return (
-    <div>
-      <h1>Genres List</h1>
-      <Link to="/admin/genres/new">Add New Genre</Link>
-      <MUIDataTable
-        title="Genres"
-        data={genres}
-        columns={columns}
-        options={options}
-      />
+    <div style={styles.container}>
+      <Sidebar /> {/* Sidebar for navigation */}
+      <main style={styles.content}>
+        <h1>Genres List</h1>
+        <Link to="/admin/genres/new">Add New Genre</Link>
+        <MUIDataTable
+          title="Genres"
+          data={genres}
+          columns={columns}
+          options={options}
+        />
+      </main>
     </div>
   );
 };

@@ -2,21 +2,23 @@ import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
 import { Button } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // Assuming you're using react-router
+import { useNavigate } from 'react-router-dom';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const navigate = useNavigate();
 
+  // Fetch books data
   const fetchBooks = async () => {
     try {
       const response = await axios.get('/books');
-      const books = response.data.books.map(book => ({
+      const books = response.data.books.map((book) => ({
         ...book,
         authorName: book.authorId ? book.authorId.name : '',
         genreName: book.genreId ? book.genreId.name : '',
-        supplierName: book.supplierId ? book.supplierId.name : ''
+        supplierName: book.supplierId ? book.supplierId.name : '',
       }));
       setBooks(books);
     } catch (error) {
@@ -28,13 +30,14 @@ const BookList = () => {
     fetchBooks();
   }, []);
 
+  // Bulk delete handler
   const handleBulkDelete = async () => {
     if (window.confirm('Are you sure you want to delete selected books?')) {
       try {
         await Promise.all(
           selectedRows.map((rowIndex) => axios.delete(`/books/${books[rowIndex]._id}`))
         );
-        fetchBooks(); // Refresh the book list
+        fetchBooks(); // Refresh book list
         setSelectedRows([]); // Clear selected rows
       } catch (error) {
         console.error('Error deleting books:', error);
@@ -42,17 +45,19 @@ const BookList = () => {
     }
   };
 
+  // Single delete handler
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
         await axios.delete(`/books/${id}`);
-        fetchBooks(); // Refresh the book list after deletion
+        fetchBooks(); // Refresh book list
       } catch (error) {
         console.error('Error deleting book:', error);
       }
     }
   };
 
+  // Define columns for the table
   const columns = [
     { name: 'title', label: 'Title' },
     {
@@ -62,14 +67,33 @@ const BookList = () => {
         customBodyRender: (value) => new Date(value).toLocaleDateString(),
       },
     },
-    { name: '_id', label: 'Actions', options: { customBodyRender: (id) => (
-      <div>
-        <Button variant="contained" color="primary" onClick={() => navigate(`/admin/books/update/${id}`)}>Edit</Button>
-        <Button variant="contained" color="secondary" onClick={() => handleDelete(id)}>Delete</Button>
-      </div>
-    )} },
+    {
+      name: '_id',
+      label: 'Actions',
+      options: {
+        customBodyRender: (id) => (
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => navigate(`/admin/books/update/${id}`)}
+            >
+              Edit
+            </Button>
+            <Button
+              variant="contained"
+              color="secondary"
+              onClick={() => handleDelete(id)}
+            >
+              Delete
+            </Button>
+          </div>
+        ),
+      },
+    },
   ];
 
+  // Define options for the table
   const options = {
     selectableRows: 'multiple',
     onRowsSelect: (rowsSelected, allRows) => {
@@ -81,35 +105,71 @@ const BookList = () => {
       return (
         <tr>
           <td colSpan={columns.length}>
-            <div>
-              <strong>Author:</strong> {book.authorName}
-            </div>
-            <div>
-              <strong>Genre:</strong> {book.genreName}
-            </div>
-            <div>
-              <strong>Supplier:</strong> {book.supplierName}
-            </div>
-            <div>
-              <strong>Stock:</strong> {book.stock}
-            </div>
-            <div>
-              <strong>Images:</strong>
-              {book.images.map((image, index) => (
-                <img key={index} src={image.url} alt={`Book Image ${index + 1}`} width="100" style={{ margin: '5px' }} />
-              ))}
+            <div style={{ padding: '15px' }}>
+              <p>
+                <strong>Author:</strong> {book.authorName}
+              </p>
+              <p>
+                <strong>Genre:</strong> {book.genreName}
+              </p>
+              <p>
+                <strong>Supplier:</strong> {book.supplierName}
+              </p>
+              <p>
+                <strong>Stock:</strong> {book.stock}
+              </p>
+              <div>
+                <strong>Images:</strong>
+                {book.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image.url}
+                    alt={`Book Image ${index + 1}`}
+                    width="100"
+                    style={{ margin: '5px' }}
+                  />
+                ))}
+              </div>
             </div>
           </td>
         </tr>
       );
     },
     customToolbarSelect: () => (
-      <Button variant="contained" color="secondary" onClick={handleBulkDelete}>Bulk Delete</Button>
+      <Button
+        variant="contained"
+        color="secondary"
+        onClick={handleBulkDelete}
+      >
+        Bulk Delete
+      </Button>
     ),
   };
 
+  // Layout styles
+  const styles = {
+    container: {
+      display: 'flex',
+      minHeight: '100vh',
+    },
+    content: {
+      flex: 1,
+      padding: '20px',
+    },
+  };
+
   return (
-    <MUIDataTable title="Book List" data={books} columns={columns} options={options} />
+    <div style={styles.container}>
+      <Sidebar /> {/* Sidebar for navigation */}
+      <main style={styles.content}>
+        <MUIDataTable
+          title="Book List"
+          data={books}
+          columns={columns}
+          options={options}
+        />
+      </main>
+    </div>
   );
 };
 
