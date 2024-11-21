@@ -11,6 +11,7 @@ const NewBook = () => {
   const [authorId, setAuthorId] = useState('');
   const [genreId, setGenreId] = useState('');
   const [supplierId, setSupplierId] = useState('');
+  const [price, setPrice] = useState(''); // Add price state
   const [images, setImages] = useState(null);
   const [authors, setAuthors] = useState([]);
   const [genres, setGenres] = useState([]);
@@ -59,6 +60,7 @@ const NewBook = () => {
     formData.append('title', title);
     formData.append('publicationDate', publicationDate);
     formData.append('stock', stock);
+    formData.append('price', price); // Include price in form data
     formData.append('authorId', authorId);
     formData.append('genreId', genreId);
     formData.append('supplierId', supplierId);
@@ -127,6 +129,18 @@ const NewBook = () => {
                 type="number"
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
+                min="0"
+                required
+              />
+            </label>
+          </div>
+          <div style={styles.formGroup}>
+            <label>
+              Price:
+              <input
+                type="number"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
                 min="0"
                 required
               />

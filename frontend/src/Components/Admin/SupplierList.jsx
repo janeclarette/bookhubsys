@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const SupplierList = () => {
   const [suppliers, setSuppliers] = useState([]);
@@ -98,6 +99,7 @@ const SupplierList = () => {
 
   return (
     <div>
+      <Sidebar /> {/* Sidebar for navigation */}
       <h1>Supplier List</h1>
       <Link to="/admin/suppliers/new">Add New Supplier</Link>
       <MUIDataTable

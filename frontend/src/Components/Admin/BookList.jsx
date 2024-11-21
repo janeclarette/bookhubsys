@@ -68,6 +68,18 @@ const BookList = () => {
       },
     },
     {
+      name: 'price',
+      label: 'Price',
+      options: {
+        customBodyRender: (value) => {
+          if (value == null || isNaN(value)) {
+            return '$0.00'; // Fallback if value is missing or invalid
+          }
+          return `$${value.toFixed(2)}`; // Format as price
+        },
+      },
+    },    
+    {
       name: '_id',
       label: 'Actions',
       options: {
@@ -93,7 +105,6 @@ const BookList = () => {
     },
   ];
 
-  // Define options for the table
   const options = {
     selectableRows: 'multiple',
     onRowsSelect: (rowsSelected, allRows) => {

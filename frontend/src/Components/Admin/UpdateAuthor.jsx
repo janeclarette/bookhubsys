@@ -11,6 +11,7 @@ import {
 } from '@mui/material';
 import { Delete } from '@mui/icons-material';
 import axios from '../../utils/axiosConfig';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const UpdateAuthor = () => {
   const { id } = useParams();
@@ -112,7 +113,7 @@ const UpdateAuthor = () => {
         onChange={handleFileChange}
         style={{ marginTop: '16px' }}
       />
-
+      <Sidebar /> {/* Sidebar for navigation */}
       <Button variant="contained" type="submit" color="primary" sx={{ mt: 2 }}>
         Update Author
       </Button>

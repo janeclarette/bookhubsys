@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import { useParams, useNavigate } from 'react-router-dom';
 import { TextField, Button, Typography, Box } from '@mui/material';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const UpdateGenre = () => {
   const { id } = useParams();
@@ -32,7 +33,9 @@ const UpdateGenre = () => {
   };
 
   return (
+    
     <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+      <Sidebar /> {/* Sidebar for navigation */}
       <Typography variant="h5" gutterBottom>Update Genre</Typography>
       <TextField
         label="Genre Name"

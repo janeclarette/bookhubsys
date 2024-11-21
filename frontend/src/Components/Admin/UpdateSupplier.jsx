@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import { useParams, useNavigate } from 'react-router-dom';
+import Sidebar from './Sidebar'; // Import Sidebar
 
 const UpdateSupplier = () => {
     const { id } = useParams();
@@ -49,6 +50,7 @@ const UpdateSupplier = () => {
 
     return (
         <form onSubmit={updateSupplier}>
+            <Sidebar /> {/* Sidebar for navigation */}
             <h1>Update Supplier</h1>
             <input type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} required />
             <input type="text" placeholder="Contact Info" value={contactInfo} onChange={(e) => setContactInfo(e.target.value)} required />

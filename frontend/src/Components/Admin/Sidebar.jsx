@@ -56,7 +56,7 @@ const Sidebar = () => {
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {/* Dashboard */}
             <li style={{ marginBottom: '20px' }}>
-              <Link to="/" style={navItemStyle('/')}> <FaTachometerAlt style={{ marginRight: '10px' }} /> Dashboard </Link>
+              <Link to="/admin" style={navItemStyle('/')}> <FaTachometerAlt style={{ marginRight: '10px' }} /> Dashboard </Link>
             </li>
 
             {/* Authors Management */}
@@ -93,7 +93,7 @@ const Sidebar = () => {
               {showSuppliersDropdown && (
                 <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
                   <li><Link to="/admin/suppliers/new" style={navItemStyle('/admin/suppliers/new')}>Add New Supplier</Link></li>
-                  <li><Link to="/admin/suppliers/list" style={navItemStyle('/admin/suppliers/list')}>Supplier List</Link></li>
+                  <li><Link to="/admin/suppliers" style={navItemStyle('/admin/suppliers')}>Supplier List</Link></li>
                 </ul>
               )}
             </li>
