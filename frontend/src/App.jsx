@@ -18,11 +18,16 @@ import Login from './Components/User/Login';
 import Register from './Components/User/Register';
 // import ProtectedRoutes from './Components/Route/ProtectedRoutes';
 import Home from './Components/Home'; 
+import Genre from './Components/Genre';
+import Authors from './Components/Authors';
+import AuthorsWorks from './Components/AuthorsWorks';
 
 import Sidebar from './Components/Admin/Sidebar';
 import Dashboard from './Components/Admin/Dashboard';
 
+
 import './App.css';
+
 
 const App = () => {
     return (
@@ -49,6 +54,9 @@ const App = () => {
                 <Route path="/user/register" element={<Register />} />
                 {/* <ProtectedRoute path="/admin" element={<AdminDashboard />} /> */}
                 <Route path="/admin" element={<Dashboard />}/>
+                <Route path="/genres" element={<Genre />} />
+                <Route path="/authors" element={<Authors />} />
+                <Route path="/authorworks/:authorId" element={<AuthorsWorks />} />
                 
 
             </Routes>

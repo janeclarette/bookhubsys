@@ -54,20 +54,21 @@ exports.createBook = async (req, res) => {
 
 exports.updateBook = async (req, res) => {
     try {
-
         let book = await Book.findById(req.params.id);
         if (!book) return res.status(404).json({ success: false, message: 'Book not found' });
 
-
         if (req.files) {
-            
             const uploadedImages = await uploadImages(req.files.map(file => ({ path: file.path })));
-           
             const newImages = uploadedImages.map(image => ({
                 public_id: image.public_id,
                 url: image.secure_url
             }));
-            req.body.images = newImages; 
+            req.body.images = newImages;
+        }
+
+        // Ensure price is handled
+        if (req.body.price !== undefined) {
+            req.body.price = parseFloat(req.body.price);
         }
 
         book = await Book.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });

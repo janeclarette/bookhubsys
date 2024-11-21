@@ -41,7 +41,12 @@ const bookSchema = new mongoose.Schema({
             type: String,
             required: true
         }
-    }]
+    }],
+    price: {   
+        type: Number,
+        required: [true, 'Please provide a price for the book'],
+        min: [0, 'Price cannot be negative']
+    }
 });
 
 module.exports = mongoose.model('Book', bookSchema);
