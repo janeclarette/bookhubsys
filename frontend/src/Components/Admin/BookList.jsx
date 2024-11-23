@@ -1,13 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
-import { Button } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar'; // Import Sidebar
+import NewBook from './NewBook'; // Import NewBook modal component
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [isSidebarHovered, setSidebarHovered] = useState(false);
+  const [isNewBookModalOpen, setIsNewBookModalOpen] = useState(false); // Modal state
   const navigate = useNavigate();
 
   // Fetch books data
@@ -78,7 +81,7 @@ const BookList = () => {
           return `$${value.toFixed(2)}`; // Format as price
         },
       },
-    },    
+    },
     {
       name: '_id',
       label: 'Actions',
@@ -167,20 +170,91 @@ const BookList = () => {
       flex: 1,
       padding: '20px',
     },
+    header: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      marginBottom: '20px',
+    },
+    addButton: {
+      background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
+      color: 'white',
+      borderRadius: '25px',
+      padding: '10px 20px',
+      textTransform: 'none',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      '&:hover': {
+        background: 'linear-gradient(135deg, #c6a0e5, #9e1c63)',
+      },
+    },
   };
 
   return (
-    <div style={styles.container}>
-      <Sidebar /> {/* Sidebar for navigation */}
-      <main style={styles.content}>
+    <Box display="flex" minHeight="100vh">
+      {/* Sidebar component with hover effect handling */}
+      <Sidebar onHoverChange={setSidebarHovered} />
+
+      {/* Main content area */}
+      <Box
+        style={{
+          marginLeft: isSidebarHovered ? '250px' : '60px',
+          transition: 'margin-left 0.3s ease',
+          padding: '20px',
+          width: '100%',
+        }}
+      >
+        {/* Header */}
+        <Box sx={styles.header}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontFamily: 'Fjalla One, sans-serif',
+              fontWeight: 'bold',
+              textAlign: 'left', // Ensure title is left-aligned
+              marginTop: '20px', // Slightly move title down
+            }}
+          >
+            Book Management
+          </Typography>
+          <Typography
+            variant="body3"
+            sx={{
+              color: 'gray',
+              marginTop: 1,
+              marginBottom: -8,
+              textAlign: 'left', // Ensure subtitle is left-aligned
+            }}
+          >
+            Manage your collection of books by adding, updating, or removing entries from the system.
+          </Typography>
+        </Box>
+
+        {/* Add New Book Button */}
+        <Box sx={{ marginBottom: '20px', textAlign: 'right' }}>
+          <Button
+            variant="contained"
+            sx={styles.addButton}
+            onClick={() => setIsNewBookModalOpen(true)} // Open modal on click
+          >
+            Add New Book
+          </Button>
+        </Box>
+
+        {/* DataTable for books */}
         <MUIDataTable
           title="Book List"
           data={books}
           columns={columns}
           options={options}
         />
-      </main>
-    </div>
+      </Box>
+
+      {/* New Book Modal */}
+      <NewBook
+        isModalVisible={isNewBookModalOpen}
+        onClose={() => setIsNewBookModalOpen(false)} // Close modal on close button click
+      />
+    </Box>
   );
 };
 

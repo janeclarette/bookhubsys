@@ -1,13 +1,14 @@
-// src/Components/Admin/SupplierList.jsx
 import React, { useState, useEffect } from 'react';
-import MUIDataTable from 'mui-datatables';
-import { Link } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
-import Sidebar from './Sidebar'; // Import Sidebar
+import MUIDataTable from 'mui-datatables';
+import Sidebar from './Sidebar';
+import { Box, Button, Typography } from '@mui/material';
+import NewSupplier from './NewSupplier';
 
 const SupplierList = () => {
   const [suppliers, setSuppliers] = useState([]);
-  const [selectedSuppliers, setSelectedSuppliers] = useState([]);
+  const [isSidebarHovered, setSidebarHovered] = useState(false);
+  const [openModal, setOpenModal] = useState(false);
 
   useEffect(() => {
     fetchSuppliers();
@@ -22,57 +23,22 @@ const SupplierList = () => {
     }
   };
 
-  const handleBulkDelete = async () => {
-    try {
-      await Promise.all(
-        selectedSuppliers.map((id) => axios.delete(`/suppliers/${id}`))
-      );
-      setSuppliers(suppliers.filter((supplier) => !selectedSuppliers.includes(supplier._id)));
-      setSelectedSuppliers([]);
-      alert('Selected suppliers deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting suppliers:', error);
-    }
-  };
-
   const columns = [
-    {
-      name: 'name',
-      label: 'Name',
-    },
-    {
-      name: 'contactInfo',
-      label: 'Contact Info',
-    },
-    {
-      name: 'address',
-      label: 'Address',
-    },
-    {
-      name: 'imagePath',
-      label: 'Images',
-      options: {
-        display: false, // Images shown in expandable row
-      },
-    },
+    { name: 'name', label: 'Name' },
+    { name: 'contactInfo', label: 'Contact Info' },
+    { name: 'address', label: 'Address' },
+    { name: 'imagePath', label: 'Images', options: { display: false } },
     {
       name: '_id',
       label: 'Actions',
       options: {
-        customBodyRender: (value) => (
-          <Link to={`/admin/suppliers/update/${value}`}>Edit</Link>
-        ),
+        customBodyRender: (value) => <div>{/* Action buttons */}</div>,
       },
     },
   ];
 
   const options = {
     selectableRows: 'multiple',
-    onRowsDelete: (rowsDeleted) => {
-      const idsToDelete = rowsDeleted.data.map((row) => suppliers[row.dataIndex]._id);
-      setSelectedSuppliers(idsToDelete);
-      return false; // Prevents default deletion; will handle in `handleBulkDelete`
-    },
     expandableRows: true,
     renderExpandableRow: (rowData, rowMeta) => {
       const supplier = suppliers[rowMeta.dataIndex];
@@ -84,7 +50,12 @@ const SupplierList = () => {
               <div>
                 {supplier.imagePath && supplier.imagePath.length > 0 ? (
                   supplier.imagePath.map((image, index) => (
-                    <img key={index} src={image} alt={`${supplier.name} Image ${index + 1}`} style={{ width: '100px', marginRight: '10px' }} />
+                    <img
+                      key={index}
+                      src={image}
+                      alt={`${supplier.name} Image ${index + 1}`}
+                      style={{ width: '100px', marginRight: '10px' }}
+                    />
                   ))
                 ) : (
                   <p>No images available</p>
@@ -98,20 +69,64 @@ const SupplierList = () => {
   };
 
   return (
-    <div>
-      <Sidebar /> {/* Sidebar for navigation */}
-      <h1>Supplier List</h1>
-      <Link to="/admin/suppliers/new">Add New Supplier</Link>
-      <MUIDataTable
-        title="Suppliers"
-        data={suppliers}
-        columns={columns}
-        options={options}
-      />
-      {selectedSuppliers.length > 0 && (
-        <button onClick={handleBulkDelete}>Delete Selected</button>
-      )}
-    </div>
+    <Box display="flex" minHeight="100vh">
+      {/* Sidebar component */}
+      <Sidebar onHoverChange={setSidebarHovered} />
+
+      {/* Main Content Area */}
+      <Box
+        style={{
+          marginLeft: isSidebarHovered ? '250px' : '60px',
+          transition: 'margin-left 0.3s ease',
+          padding: '20px',
+          width: '100%',
+        }}
+      >
+        {/* Header Section */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
+          <Box display="flex" flexDirection="column" justifyContent="flex-start">
+            <Typography
+              variant="h4"
+              marginRight={20}
+              sx={{ fontFamily: 'Fjalla One, sans-serif', fontWeight: 'bold' }}
+            >
+              Supplier Management
+            </Typography>
+            <Typography variant="body3" sx={{ color: 'gray', marginTop: 2 }}>
+              Add new suppliers, edit details, and manage your supplier inventory effectively.
+            </Typography>
+          </Box>
+
+          <Button
+            variant="contained"
+            onClick={() => setOpenModal(true)}
+            sx={{
+              background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
+              color: 'white',
+              borderRadius: '25px',
+              padding: '10px 20px',
+              textTransform: 'none',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #c6a0e5, #9e1c63)',
+              },
+            }}
+          >
+            Add New Supplier
+          </Button>
+        </Box>
+
+        {/* DataTable */}
+        <MUIDataTable title="Supplier List" data={suppliers} columns={columns} options={options} />
+
+        {/* Modal for Adding New Supplier */}
+        <NewSupplier
+          open={openModal}
+          onClose={() => setOpenModal(false)}
+          onSupplierCreated={fetchSuppliers}
+        />
+      </Box>
+    </Box>
   );
 };
 

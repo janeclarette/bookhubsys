@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { FaTachometerAlt, FaChevronDown, FaUser, FaBook, FaLayerGroup, FaBox } from 'react-icons/fa';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt } from 'react-icons/fa';
 import bookhubLogo from '../../assets/img/bookhublogo.png';
 import bookhubIcon from '../../assets/img/bookhubIcon.gif';
 
-const Sidebar = () => {
-  const [showAuthorsDropdown, setShowAuthorsDropdown] = useState(false);
-  const [showGenresDropdown, setShowGenresDropdown] = useState(false);
-  const [showBooksDropdown, setShowBooksDropdown] = useState(false);
-  const [showSuppliersDropdown, setShowSuppliersDropdown] = useState(false);
-
+const Sidebar = ({ onHoverChange }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate(); // To navigate after logout
 
   const navItemStyle = (path) => ({
     display: 'flex',
@@ -18,102 +15,141 @@ const Sidebar = () => {
     fontSize: '18px',
     marginBottom: '20px',
     padding: '10px 15px',
-    borderRadius: '8px',
+    borderRadius: '25px',
     textDecoration: 'none',
-    backgroundColor: location.pathname === path ? '#1b1b3a' : 'transparent',
+    backgroundColor: location.pathname === path ? '#9e1c63' : 'transparent',
     color: location.pathname === path ? '#ffffff' : '#262222',
-    transition: 'background-color 0.1s ease, color 0.1s ease',
+    transition: 'background-color 0.3s ease, color 0.3s ease',
+    width: '100%',
+    boxSizing: 'border-box',
+    '&:hover': {
+      background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
+      color: 'white',
+    },
   });
 
-  const hoverStyle = {
-    backgroundColor: '#1b1b3a',
-    color: '#ffffff',
+  const iconStyle = {
+    fontSize: '24px',
+    marginRight: '10px',
+  };
+
+  const handleMouseEnter = () => {
+    setIsHovered(true);
+    onHoverChange(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
+    onHoverChange(false);
+  };
+
+  const handleLogout = () => {
+    // Clear user authentication (this depends on your authentication setup)
+    // For example, you can clear localStorage or a token from a global state
+    localStorage.removeItem('authToken'); // Example
+    navigate('/login'); // Redirect to login page after logout
   };
 
   return (
-    <div style={{
-      userSelect: 'none',
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '250px',
-      height: '95vh',
-      backgroundColor: '#f2f4ff',
-      color: '#262222',
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'space-between',
-      padding: '30px',
-      boxShadow: '2px 0 5px rgba(0, 0, 0, 0.5)',
-    }}>
+    <div
+      style={{
+        userSelect: 'none',
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: isHovered ? '250px' : '60px',
+        height: '95vh',
+        backgroundColor: '#f2f4ff',
+        color: '#262222',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        padding: '30px 10px',
+        boxShadow: '2px 0 5px rgba(0, 0, 0, 0.5)',
+        zIndex: 1000,
+        transition: 'width 0.3s ease',
+      }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px' }}>
-          <img src={bookhubIcon} alt="Book Hub Icon" style={{ width: '60px', marginLeft: '10px' }} />
-          <img src={bookhubLogo} alt="Book Hub Logo" style={{ width: '150px' }} />
+          <img
+            src={bookhubIcon}
+            alt="Book Hub Icon"
+            style={{ width: '60px', marginLeft: '1px' }}
+          />
+          <img
+            src={bookhubLogo}
+            alt="Book Hub Logo"
+            style={{
+              width: isHovered ? '150px' : '0px',
+              transition: 'width 0.3s ease',
+              visibility: isHovered ? 'visible' : 'hidden',
+            }}
+          />
         </div>
 
         <nav>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {/* Dashboard */}
-            <li style={{ marginBottom: '20px' }}>
-              <Link to="/admin" style={navItemStyle('/')}> <FaTachometerAlt style={{ marginRight: '10px' }} /> Dashboard </Link>
-            </li>
-
-            {/* Authors Management */}
-            <li style={{ marginBottom: '20px' }}>
-              <div onClick={() => setShowAuthorsDropdown(!showAuthorsDropdown)} style={{ ...navItemStyle('/admin/authors'), cursor: 'pointer' }}>
-                <FaUser style={{ marginRight: '10px' }} /> Authors Management <FaChevronDown style={{ marginLeft: 'auto' }} />
-              </div>
-              {showAuthorsDropdown && (
-                <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/admin/authors/new" style={navItemStyle('/admin/authors/new')}>Add New Author</Link></li>
-                  <li><Link to="/admin/authors" style={navItemStyle('/admin/authors')}>Author List</Link></li>
-                </ul>
-              )}
-            </li>
-
-            {/* Genre Management */}
-            <li style={{ marginBottom: '20px' }}>
-              <div onClick={() => setShowGenresDropdown(!showGenresDropdown)} style={{ ...navItemStyle('/admin/genres'), cursor: 'pointer' }}>
-                <FaLayerGroup style={{ marginRight: '10px' }} /> Genre Management <FaChevronDown style={{ marginLeft: 'auto' }} />
-              </div>
-              {showGenresDropdown && (
-                <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/admin/genres/new" style={navItemStyle('/admin/genres/new')}>Add New Genre</Link></li>
-                  <li><Link to="/admin/genres" style={navItemStyle('/admin/genres')}>Genre List</Link></li>
-                </ul>
-              )}
-            </li>
-
-            {/* Supplier Management */}
-            <li style={{ marginBottom: '20px' }}>
-              <div onClick={() => setShowSuppliersDropdown(!showSuppliersDropdown)} style={{ ...navItemStyle('/admin/suppliers'), cursor: 'pointer' }}>
-                <FaBox style={{ marginRight: '10px' }} /> Supplier Management <FaChevronDown style={{ marginLeft: 'auto' }} />
-              </div>
-              {showSuppliersDropdown && (
-                <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/admin/suppliers/new" style={navItemStyle('/admin/suppliers/new')}>Add New Supplier</Link></li>
-                  <li><Link to="/admin/suppliers" style={navItemStyle('/admin/suppliers')}>Supplier List</Link></li>
-                </ul>
-              )}
-            </li>
-
-            {/* Book Management */}
-            <li style={{ marginBottom: '20px' }}>
-              <div onClick={() => setShowBooksDropdown(!showBooksDropdown)} style={{ ...navItemStyle('/admin/books'), cursor: 'pointer' }}>
-                <FaBook style={{ marginRight: '10px' }} /> Book Management <FaChevronDown style={{ marginLeft: 'auto' }} />
-              </div>
-              {showBooksDropdown && (
-                <ul style={{ listStyle: 'none', paddingLeft: '20px', marginTop: '10px' }}>
-                  <li><Link to="/admin/books/new" style={navItemStyle('/admin/books/new')}>Add New Book</Link></li>
-                  <li><Link to="/admin/books" style={navItemStyle('/admin/books')}>Book List</Link></li>
-                </ul>
-              )}
-            </li>
+            {[ 
+              { to: '/admin', icon: <FaTachometerAlt style={iconStyle} />, label: 'Dashboard' },
+              { to: '/admin/authors', icon: <FaUser style={iconStyle} />, label: 'Author Management' },
+              { to: '/admin/genres', icon: <FaLayerGroup style={iconStyle} />, label: 'Genre Management' },
+              { to: '/admin/suppliers', icon: <FaBox style={iconStyle} />, label: 'Supplier Management' },
+              { to: '/admin/books', icon: <FaBook style={iconStyle} />, label: 'Book Management' },
+            ].map(({ to, icon, label }, index) => (
+              <li key={index} style={{ marginBottom: '20px' }}>
+                <Link to={to} style={navItemStyle(to)}>
+                  <span style={{ display: 'flex', alignItems: 'center' }}>
+                    {icon}
+                    <span
+                      style={{
+                        marginLeft: '10px',
+                        opacity: isHovered ? 1 : 0,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        transition: 'opacity 0.3s ease',
+                      }}
+                    >
+                      {label}
+                    </span>
+                  </span>
+                </Link>
+              </li>
+            ))}
           </ul>
         </nav>
       </div>
-      <div style={{ fontSize: '16px', color: '#262222', textAlign: 'center' }}>
+
+      <div style={{ marginTop: '0', marginBottom: '0px' }}>
+        <Link to="#" style={navItemStyle("#")} onClick={handleLogout}>
+          <span style={{ display: 'flex', alignItems: 'center' }}>
+            <FaSignOutAlt style={iconStyle} />
+            <span
+              style={{
+                marginLeft: '0px',
+                opacity: isHovered ? 1 : 0,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                transition: 'opacity 0.3s ease',
+              }}
+            >
+              Logout
+            </span>
+          </span>
+        </Link>
+      </div>
+
+      <div
+        style={{
+          marginLeft: '10px',
+          opacity: isHovered ? 1 : 0,
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          transition: 'opacity 0.3s ease',
+        }}
+      >
         <p>Book Hub</p>
         <p>All rights reserved</p>
       </div>

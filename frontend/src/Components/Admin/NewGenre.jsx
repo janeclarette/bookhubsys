@@ -1,57 +1,97 @@
 import React, { useState } from 'react';
 import axios from '../../utils/axiosConfig';
-import { useNavigate } from 'react-router-dom';
-import { TextField, Button, Typography, Box } from '@mui/material';
-import Sidebar from './Sidebar'; // Import Sidebar
+import { Box, Button, TextField, Typography, Modal, Paper, Stack, IconButton, Divider } from '@mui/material';
+import { FaTimes } from 'react-icons/fa';
 
-const NewGenre = () => {
+const NewGenre = ({ isModalVisible, onClose }) => {
   const [name, setName] = useState('');
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       await axios.post('/genres', { name });
-      navigate('/admin/genres');
+      alert('Genre created successfully!');
+      setName('');
+      onClose(); // Close modal after successful submission
     } catch (error) {
       console.error('Error creating genre:', error);
     }
   };
 
-  // Layout styles
-  const styles = {
-    container: {
-      display: 'flex',
-      minHeight: '100vh',
-    },
-    content: {
-      flex: 1,
-      padding: '20px',
-    },
-  };
-
   return (
-    <div style={styles.container}>
-      <Sidebar /> {/* Sidebar for navigation */}
-      <main style={styles.content}>
-        <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-          <Typography variant="h5" gutterBottom>
+    <Modal
+      open={isModalVisible}
+      onClose={onClose}
+      aria-labelledby="modal-title"
+      aria-describedby="modal-description"
+    >
+      <Box
+        component={Paper}
+        sx={{
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: 450,
+          padding: 3,
+          borderRadius: 3,
+          backgroundColor: '#fff',
+          boxShadow: 24,
+          overflow: 'hidden',
+        }}
+      >
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Typography id="modal-title" variant="h6" component="h2">
             Add New Genre
           </Typography>
-          <TextField
-            label="Genre Name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            fullWidth
-            sx={{ mb: 2 }}
-          />
-          <Button variant="contained" type="submit" color="primary">
-            Add Genre
-          </Button>
+          <IconButton onClick={onClose} sx={{ color: '#9e1c63' }}>
+            <FaTimes />
+          </IconButton>
         </Box>
-      </main>
-    </div>
+        <Divider sx={{ marginBottom: 2 }} />
+
+        <form onSubmit={handleSubmit}>
+          <Stack spacing={2}>
+            <TextField
+              label="Genre Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              fullWidth
+              required
+              sx={{ borderRadius: 2 }}
+            />
+
+            <Stack direction="row" justifyContent="space-between">
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  padding: '10px 20px',
+                  fontWeight: 'bold',
+                }}
+              >
+                Add Genre
+              </Button>
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={onClose}
+                sx={{
+                  borderRadius: 2,
+                  textTransform: 'none',
+                  padding: '10px 20px',
+                }}
+              >
+                Close
+              </Button>
+            </Stack>
+          </Stack>
+        </form>
+      </Box>
+    </Modal>
   );
 };
 

@@ -163,3 +163,5 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
 };
 
 export default NewAuthor;
+
+
