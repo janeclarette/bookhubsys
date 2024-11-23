@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
@@ -10,24 +10,50 @@ import {
   IconButton,
   Divider,
 } from '@mui/material';
-import axios from '../../utils/axiosConfig';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { FaTimes } from 'react-icons/fa';
+import axios from '../../utils/axiosConfig';
 
-const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop name
-  const [name, setName] = useState('');
-  const [bio, setBio] = useState('');
-  const [images, setImages] = useState(null);
+// Validation schema with Yup
+const schema = yup.object().shape({
+  name: yup
+    .string()
+    .required('Name is required')
+    .matches(/^[A-Za-z\s]+$/, 'Name must not contain numbers or special characters'),
+  bio: yup
+    .string()
+    .required('Bio is required')
+    .max(1000, 'Bio must be less than 1000 characters'),
+});
+
+const NewAuthor = ({ isModalVisible, onClose }) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: '',
+      bio: '',
+    },
+  });
+
+  // Initialize images state as an empty array instead of null
+  const [images, setImages] = React.useState([]);
 
   const handleFileChange = (e) => {
     setImages(e.target.files);
   };
 
-  const createAuthor = async (e) => {
-    e.preventDefault();
+  const createAuthor = async (data) => {
     const formData = new FormData();
-    formData.append('name', name);
-    formData.append('bio', bio);
-    if (images) {
+    formData.append('name', data.name);
+    formData.append('bio', data.bio);
+    if (images.length > 0) { // Only append images if any are selected
       Array.from(images).forEach((image) => formData.append('images', image));
     }
 
@@ -36,10 +62,9 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('Author created successfully!');
-      setName('');
-      setBio('');
-      setImages(null);
-      onClose(); // Close modal after successful submission
+      reset(); // Reset the form after successful submission
+      setImages([]); // Reset the images state to an empty array
+      onClose(); // Close modal after submission
     } catch (error) {
       console.error('Error creating author:', error);
     }
@@ -47,7 +72,7 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
 
   return (
     <Modal
-      open={isModalVisible}  // Modal visibility based on the prop
+      open={isModalVisible}
       onClose={onClose}
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
@@ -77,20 +102,21 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
         </Box>
         <Divider sx={{ marginBottom: 2 }} />
 
-        <form onSubmit={createAuthor}>
+        <form onSubmit={handleSubmit(createAuthor)}>
           <Stack spacing={2}>
             <TextField
               label="Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register('name')}
+              error={!!errors.name}
+              helperText={errors.name?.message}
               fullWidth
-              required
               sx={{ borderRadius: 2 }}
             />
             <TextField
               label="Bio"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
+              {...register('bio')}
+              error={!!errors.bio}
+              helperText={errors.bio?.message}
               multiline
               rows={4}
               fullWidth
@@ -122,7 +148,7 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
               />
             </Button>
 
-            {images && images.length > 0 && (
+            {images.length > 0 && (
               <Typography variant="body2" sx={{ color: 'green' }}>
                 {images.length} image(s) selected
               </Typography>
@@ -132,12 +158,15 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   padding: '10px 20px',
                   fontWeight: 'bold',
+                  backgroundColor: '#9e1c63', // Purple button
+                  '&:hover': {
+                    backgroundColor: '#7a1451', // Darker purple on hover
+                  },
                 }}
               >
                 Create Author
@@ -145,11 +174,19 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
               <Button
                 variant="outlined"
                 color="error"
-                onClick={onClose}
+                onClick={() => {
+                  reset(); // Clear form on close
+                  setImages([]); // Clear images state
+                  onClose();
+                }}
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   padding: '10px 20px',
+                  '&:hover': {
+                    backgroundColor: '#f06292', // Pink hover effect
+                    borderColor: '#f06292', // Pink border on hover
+                  },
                 }}
               >
                 Close
@@ -163,5 +200,3 @@ const NewAuthor = ({ isModalVisible, onClose }) => {  // Changed to match prop n
 };
 
 export default NewAuthor;
-
-

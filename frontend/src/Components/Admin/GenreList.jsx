@@ -4,6 +4,7 @@ import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
 import Sidebar from './Sidebar';
 import { Box, Button, Typography, Paper, TableContainer } from '@mui/material';
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
 import NewGenre from './NewGenre'; // Import the NewGenre modal component
 
 const GenreList = () => {
@@ -53,11 +54,36 @@ const GenreList = () => {
         customBodyRender: (value) => (
           <div>
             <Link to={`/admin/genres/update/${value}`} style={{ marginRight: '10px' }}>
-              Edit
+              <Button
+                variant="contained"
+                sx={{
+                  backgroundColor: '#e91e63', // Pink color
+                  color: 'white',
+                  padding: '5px 15px',
+                  textTransform: 'none',
+                  '&:hover': {
+                    backgroundColor: '#d81b60', // Darker pink on hover
+                  },
+                }}
+              >
+                <FaEdit style={{ marginRight: '5px' }} /> Edit
+              </Button>
             </Link>
-            <button onClick={() => deleteGenre(value)} style={{ color: 'red', cursor: 'pointer' }}>
-              Delete
-            </button>
+            <Button
+              onClick={() => deleteGenre(value)}
+              variant="contained"
+              sx={{
+                backgroundColor: '#9e1c63', // Purple color
+                color: 'white',
+                padding: '5px 15px',
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                },
+              }}
+            >
+              <FaTrash style={{ marginRight: '5px' }} /> Delete
+            </Button>
           </div>
         ),
       },
@@ -70,12 +96,14 @@ const GenreList = () => {
       deleteSelectedGenres(rowsDeleted);
     },
     customToolbarSelect: (selectedRows) => (
-      <button
+      <Button
         onClick={() => deleteSelectedGenres(selectedRows)}
-        style={{ color: 'red', cursor: 'pointer' }}
+        variant="outlined"
+        color="error"
+        sx={{ marginTop: 2 }}
       >
         Delete Selected
-      </button>
+      </Button>
     ),
   };
 
@@ -91,7 +119,7 @@ const GenreList = () => {
           width: '100%',
         }}
       >
-         <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={2}>
           <Box display="flex" flexDirection="column" justifyContent="flex-start">
             <Typography
               variant="h4"
@@ -101,11 +129,10 @@ const GenreList = () => {
               Genre Management
             </Typography>
             <Typography variant="body3" sx={{ color: 'gray', marginTop: 2 }}>
-            Manage and organize your list of genres, add new genres, update details, or delete
-            existing ones.
+              Manage and organize your list of genres, add new genres, update details, or delete
+              existing ones.
             </Typography>
           </Box>
-
 
           <Button
             variant="contained"

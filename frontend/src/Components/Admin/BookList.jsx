@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
-import { Button } from '@mui/material';
+import { Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar'; // Import Sidebar
+import NewBook from './NewBook'; // Import NewBook modal component
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Added icons
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
+  const [isSidebarHovered, setSidebarHovered] = useState(false);
+  const [isNewBookModalOpen, setIsNewBookModalOpen] = useState(false); // Modal state
   const navigate = useNavigate();
 
   // Fetch books data
@@ -18,7 +22,7 @@ const BookList = () => {
         ...book,
         authorName: book.authorId ? book.authorId.name : '',
         genreName: book.genreId ? book.genreId.name : '',
-        supplierName: book.supplierId ? book.supplierId.name : '',
+        supplierName: book.supplierId ? book.supplierId.name : '', // Updated supplier as a reference
       }));
       setBooks(books);
     } catch (error) {
@@ -78,7 +82,7 @@ const BookList = () => {
           return `$${value.toFixed(2)}`; // Format as price
         },
       },
-    },    
+    },
     {
       name: '_id',
       label: 'Actions',
@@ -87,17 +91,33 @@ const BookList = () => {
           <div style={{ display: 'flex', gap: '10px' }}>
             <Button
               variant="contained"
-              color="primary"
+              sx={{
+                backgroundColor: '#e91e63', // Purple color
+                color: 'white',
+                padding: '5px 15px',
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#d81b60', // Lighter purple on hover
+                },
+              }}
               onClick={() => navigate(`/admin/books/update/${id}`)}
             >
-              Edit
+              <FaEdit style={{ marginRight: '5px' }} /> Edit
             </Button>
             <Button
               variant="contained"
-              color="secondary"
+              sx={{
+                backgroundColor: '#9e1c63', // Purple color
+                color: 'white',
+                padding: '5px 15px',
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                },
+              }}
               onClick={() => handleDelete(id)}
             >
-              Delete
+              <FaTrash style={{ marginRight: '5px' }} /> Delete
             </Button>
           </div>
         ),
@@ -162,25 +182,91 @@ const BookList = () => {
     container: {
       display: 'flex',
       minHeight: '100vh',
+      overflow: 'hidden',
     },
     content: {
       flex: 1,
       padding: '20px',
     },
+    header: {
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'flex-start',
+      marginBottom: '20px',
+      marginTop: '-60px',
+    },
+    addButton: {
+      background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
+      color: 'white',
+      borderRadius: '25px',
+      padding: '10px 20px',
+      textTransform: 'none',
+      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+      '&:hover': {
+        background: 'linear-gradient(135deg, #c6a0e5, #9e1c63)',
+      },
+    },
   };
 
   return (
-    <div style={styles.container}>
-      <Sidebar /> {/* Sidebar for navigation */}
-      <main style={styles.content}>
+    <Box display="flex" minHeight="100vh">
+      <Sidebar onHoverChange={setSidebarHovered} />
+      <Box
+        style={{
+          marginLeft: isSidebarHovered ? '250px' : '60px',
+          transition: 'margin-left 0.3s ease',
+          padding: '20px',
+          width: '100%',
+        }}
+      >
+        <Box sx={styles.header}>
+          <Typography
+            variant="h4"
+            sx={{
+              fontFamily: 'Fjalla One, sans-serif',
+              fontWeight: 'bold',
+              textAlign: 'left',
+              marginTop: '20px',
+            }}
+          >
+            Book Management
+          </Typography>
+          <Typography
+            variant="body3"
+            sx={{
+              color: 'gray',
+              marginTop: 1,
+              marginBottom: -8,
+              textAlign: 'left',
+            }}
+          >
+            Manage your collection of books by adding, updating, or removing entries from the system.
+          </Typography>
+        </Box>
+
+        <Box sx={{ marginBottom: '20px', textAlign: 'right' }}>
+          <Button
+            variant="contained"
+            sx={styles.addButton}
+            onClick={() => setIsNewBookModalOpen(true)}
+          >
+            Add New Book
+          </Button>
+        </Box>
+
         <MUIDataTable
           title="Book List"
           data={books}
           columns={columns}
           options={options}
         />
-      </main>
-    </div>
+      </Box>
+
+      <NewBook
+        isModalVisible={isNewBookModalOpen}
+        onClose={() => setIsNewBookModalOpen(false)}
+      />
+    </Box>
   );
 };
 

@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React from 'react';
 import axios from '../../utils/axiosConfig';
 import { Box, Button, TextField, Typography, Modal, Paper, Stack, IconButton, Divider } from '@mui/material';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import { FaTimes } from 'react-icons/fa';
 
-const NewGenre = ({ isModalVisible, onClose }) => {
-  const [name, setName] = useState('');
+// Validation schema with Yup
+const schema = yup.object().shape({
+  name: yup.string().required('Genre name is required').min(3, 'Genre name must be at least 3 characters'),
+});
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const NewGenre = ({ isModalVisible, onClose }) => {
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: '',
+    },
+  });
+
+  const onSubmit = async (data) => {
     try {
-      await axios.post('/genres', { name });
+      await axios.post('/genres', data);
       alert('Genre created successfully!');
-      setName('');
+      reset(); // Reset the form fields
       onClose(); // Close modal after successful submission
     } catch (error) {
       console.error('Error creating genre:', error);
@@ -50,14 +67,14 @@ const NewGenre = ({ isModalVisible, onClose }) => {
         </Box>
         <Divider sx={{ marginBottom: 2 }} />
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2}>
             <TextField
               label="Genre Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              {...register('name')}
+              error={!!errors.name}
+              helperText={errors.name?.message}
               fullWidth
-              required
               sx={{ borderRadius: 2 }}
             />
 
@@ -65,12 +82,15 @@ const NewGenre = ({ isModalVisible, onClose }) => {
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   padding: '10px 20px',
                   fontWeight: 'bold',
+                  backgroundColor: '#9e1c63', // Purple button
+                  '&:hover': {
+                    backgroundColor: '#7a1451', // Darker purple on hover
+                  },
                 }}
               >
                 Add Genre
@@ -78,11 +98,18 @@ const NewGenre = ({ isModalVisible, onClose }) => {
               <Button
                 variant="outlined"
                 color="error"
-                onClick={onClose}
+                onClick={() => {
+                  reset(); // Clear form on close
+                  onClose();
+                }}
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   padding: '10px 20px',
+                  '&:hover': {
+                    backgroundColor: '#f06292', // Pink hover effect
+                    borderColor: '#f06292', // Pink border on hover
+                  },
                 }}
               >
                 Close

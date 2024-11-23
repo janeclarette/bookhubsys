@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
@@ -10,36 +10,63 @@ import {
   IconButton,
   Divider,
 } from '@mui/material';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
 import axios from '../../utils/axiosConfig';
 import { FaTimes } from 'react-icons/fa';
 
 const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
-  const [name, setName] = useState('');
-  const [contactInfo, setContactInfo] = useState('');
-  const [address, setAddress] = useState('');
-  const [images, setImages] = useState([]);
+  // Define validation schema with Yup
+  const schema = yup.object().shape({
+    name: yup.string().required('Supplier Name is required'),
+    contactInfo: yup
+      .string()
+      .matches(/^\d+$/, 'Contact Info must be a valid number')
+      .required('Contact Info is required'),
+    address: yup.string().required('Address is required'),
+    images: yup
+      .mixed()
+      .test('fileCount', 'At least one image is required', (value) => value && value.length > 0),
+  });
+
+  // Initialize React Hook Form
+  const {
+    control,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: '',
+      contactInfo: '',
+      address: '',
+      images: [],
+    },
+  });
+
+  const images = watch('images');
 
   const handleFileChange = (e) => {
-    setImages(e.target.files);
+    setValue('images', e.target.files);
   };
 
-  const createSupplier = async (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
     const formData = new FormData();
-    formData.append('name', name);
-    formData.append('contactInfo', contactInfo);
-    formData.append('address', address);
-    Array.from(images).forEach((image) => formData.append('images', image));
+    formData.append('name', data.name);
+    formData.append('contactInfo', data.contactInfo);
+    formData.append('address', data.address);
+    Array.from(data.images).forEach((image) => formData.append('images', image));
 
     try {
       await axios.post('/suppliers', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('Supplier created successfully!');
-      setName('');
-      setContactInfo('');
-      setAddress('');
-      setImages([]);
+      reset();
       onSupplierCreated(); // Notify parent to refresh the supplier list
       onClose(); // Close the modal
     } catch (error) {
@@ -74,32 +101,54 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
         </Box>
         <Divider sx={{ marginBottom: 2 }} />
 
-        <form onSubmit={createSupplier}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <Stack spacing={2}>
-            <TextField
-              label="Supplier Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              fullWidth
-              required
-              sx={{ borderRadius: 2 }}
-            />
-            <TextField
-              label="Contact Info"
-              value={contactInfo}
-              onChange={(e) => setContactInfo(e.target.value)}
-              fullWidth
-              required
-              sx={{ borderRadius: 2 }}
-            />
-            <TextField
-              label="Address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              fullWidth
-              sx={{ borderRadius: 2 }}
+            {/* Supplier Name */}
+            <Controller
+              name="name"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Supplier Name"
+                  fullWidth
+                  error={!!errors.name}
+                  helperText={errors.name?.message}
+                />
+              )}
             />
 
+            {/* Contact Info */}
+            <Controller
+              name="contactInfo"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Contact Info"
+                  fullWidth
+                  error={!!errors.contactInfo}
+                  helperText={errors.contactInfo?.message}
+                />
+              )}
+            />
+
+            {/* Address */}
+            <Controller
+              name="address"
+              control={control}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  label="Address"
+                  fullWidth
+                  error={!!errors.address}
+                  helperText={errors.address?.message}
+                />
+              )}
+            />
+
+            {/* File Upload */}
             <Button
               variant="outlined"
               component="label"
@@ -116,25 +165,38 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
               }}
             >
               Upload Images
-              <input type="file" hidden multiple onChange={handleFileChange} />
+              <input
+                type="file"
+                hidden
+                multiple
+                onChange={handleFileChange}
+              />
             </Button>
-
+            {errors.images && (
+              <Typography variant="body2" sx={{ color: 'red' }}>
+                {errors.images.message}
+              </Typography>
+            )}
             {images && images.length > 0 && (
               <Typography variant="body2" sx={{ color: 'green' }}>
                 {images.length} image(s) selected
               </Typography>
             )}
 
+            {/* Submit and Close Buttons */}
             <Stack direction="row" justifyContent="space-between">
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
                 sx={{
                   borderRadius: 2,
                   textTransform: 'none',
                   padding: '10px 20px',
                   fontWeight: 'bold',
+                  backgroundColor: '#9c27b0', // Purple color
+                  '&:hover': {
+                    backgroundColor: '#7b1fa2', // Darker purple on hover
+                  },
                 }}
               >
                 Create Supplier
@@ -147,6 +209,10 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
                   borderRadius: 2,
                   textTransform: 'none',
                   padding: '10px 20px',
+                  '&:hover': {
+                    backgroundColor: '#f06292', // Pink hover effect
+                    borderColor: '#f06292', // Pink border on hover
+                  },
                 }}
               >
                 Close

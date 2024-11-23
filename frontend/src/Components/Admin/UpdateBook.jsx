@@ -1,22 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
-import Sidebar from './Sidebar'; // Import Sidebar
+import Sidebar from './Sidebar';
+import { Formik, Field, Form, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+import { Box, Button, TextField, Modal, Typography, Paper, Grid, Stack, Divider, IconButton, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
+import { FaTimes } from 'react-icons/fa';
+
+// Validation schema
+const validationSchema = Yup.object({
+  title: Yup.string().required('Title is required'),
+  publicationDate: Yup.date().required('Publication date is required'),
+  stock: Yup.number().min(0, 'Stock must be a positive number').required('Stock is required'),
+  price: Yup.number().min(0, 'Price must be a positive number').required('Price is required'),
+  authorId: Yup.string().required('Author is required'),
+  genreId: Yup.string().required('Genre is required'),
+  supplierId: Yup.string().required('Supplier is required'),
+});
 
 const UpdateBook = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [title, setTitle] = useState('');
-  const [publicationDate, setPublicationDate] = useState('');
-  const [stock, setStock] = useState(0);
-  const [price, setPrice] = useState(''); // Add price state
-  const [authorId, setAuthorId] = useState('');
-  const [genreId, setGenreId] = useState('');
-  const [supplierId, setSupplierId] = useState('');
-  const [images, setImages] = useState(null);
   const [authors, setAuthors] = useState([]);
   const [genres, setGenres] = useState([]);
   const [suppliers, setSuppliers] = useState([]);
+  const [bookDetails, setBookDetails] = useState({
+    title: '',
+    publicationDate: '',
+    stock: 0,
+    price: '',
+    authorId: '',
+    genreId: '',
+    supplierId: '',
+  });
 
   useEffect(() => {
     fetchAuthors();
@@ -43,36 +59,21 @@ const UpdateBook = () => {
   const fetchBook = async () => {
     try {
       const response = await axios.get(`/books/${id}`);
-      const { title, publicationDate, stock, price, authorId, genreId, supplierId } = response.data.book;
-      setTitle(title);
-      setPublicationDate(publicationDate);
-      setStock(stock);
-      setPrice(price); // Set price when fetching book details
-      setAuthorId(authorId);
-      setGenreId(genreId);
-      setSupplierId(supplierId);
+      setBookDetails(response.data.book);
     } catch (error) {
       console.error('Error fetching book:', error);
     }
   };
 
-  const handleFileChange = (e) => {
-    setImages(e.target.files);
-  };
-
-  const updateBook = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (values, { setSubmitting }) => {
     const formData = new FormData();
-    formData.append('title', title);
-    formData.append('publicationDate', publicationDate);
-    formData.append('stock', stock);
-    formData.append('price', price); // Include price in form data
-    formData.append('authorId', authorId);
-    formData.append('genreId', genreId);
-    formData.append('supplierId', supplierId);
-    if (images) {
-      Array.from(images).forEach((image) => formData.append('images', image));
-    }
+    formData.append('title', values.title);
+    formData.append('publicationDate', values.publicationDate);
+    formData.append('stock', values.stock);
+    formData.append('price', values.price);
+    formData.append('authorId', values.authorId);
+    formData.append('genreId', values.genreId);
+    formData.append('supplierId', values.supplierId);
 
     try {
       await axios.put(`/books/${id}`, formData, {
@@ -83,106 +84,155 @@ const UpdateBook = () => {
     } catch (error) {
       console.error('Error updating book:', error);
     }
+    setSubmitting(false);
   };
 
   return (
     <div>
-      <Sidebar /> {/* Sidebar for navigation */}
-      <h1>Update Book</h1>
-      <form onSubmit={updateBook}>
-        <label>
-          Title:
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Publication Date:
-          <input
-            type="date"
-            value={publicationDate}
-            onChange={(e) => setPublicationDate(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Stock:
-          <input
-            type="number"
-            value={stock}
-            onChange={(e) => setStock(e.target.value)}
-            min="0"
-            required
-          />
-        </label>
-        <label>
-          Price:
-          <input
-            type="number"
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            min="0"
-            required
-          />
-        </label>
-        <label>
-          Author:
-          <select
-            value={authorId}
-            onChange={(e) => setAuthorId(e.target.value)}
-            required
-          >
-            <option value="">Select Author</option>
-            {authors.map((author) => (
-              <option key={author._id} value={author._id}>
-                {author.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Genre:
-          <select
-            value={genreId}
-            onChange={(e) => setGenreId(e.target.value)}
-            required
-          >
-            <option value="">Select Genre</option>
-            {genres.map((genre) => (
-              <option key={genre._id} value={genre._id}>
-                {genre.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Supplier:
-          <select
-            value={supplierId}
-            onChange={(e) => setSupplierId(e.target.value)}
-            required
-          >
-            <option value="">Select Supplier</option>
-            {suppliers.map((supplier) => (
-              <option key={supplier._id} value={supplier._id}>
-                {supplier.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Images:
-          <input
-            type="file"
-            multiple
-            onChange={handleFileChange}
-          />
-        </label>
-        <button type="submit">Update Book</button>
-      </form>
+      <Sidebar />
+      <Modal open={true} onClose={() => navigate('/admin/books')} aria-labelledby="update-book-modal-title">
+        <Box component={Paper} sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, padding: 2, borderRadius: 3, backgroundColor: '#fff', boxShadow: 24 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <Typography variant="h6" component="h2" sx={{ fontSize: '1rem' }}>
+              Update Book
+            </Typography>
+            <IconButton onClick={() => navigate('/admin/books')} sx={{ color: '#9e1c63' }}>
+              <FaTimes />
+            </IconButton>
+          </Box>
+          <Divider sx={{ marginBottom: 1 }} />
+          <Formik initialValues={bookDetails} validationSchema={validationSchema} enableReinitialize onSubmit={handleSubmit}>
+            {({ isSubmitting, setFieldValue }) => (
+              <Form>
+                <Grid container spacing={2}>
+                  {/* First Row */}
+                  <Grid item xs={6}>
+                    <label>
+                      <Field as={TextField} name="title" label="Title" fullWidth required />
+                      <ErrorMessage name="title" component="div" />
+                    </label>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <label>
+                      <Field as={TextField} name="publicationDate" type="date" fullWidth required />
+                      <ErrorMessage name="publicationDate" component="div" />
+                    </label>
+                  </Grid>
+
+                  {/* Second Row */}
+                  <Grid item xs={6}>
+                    <label>
+                      Stock:
+                      <Field as={TextField} name="stock" type="number" fullWidth required />
+                      <ErrorMessage name="stock" component="div" />
+                    </label>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <label>
+                      Price:
+                      <Field as={TextField} name="price" type="number" fullWidth required />
+                      <ErrorMessage name="price" component="div" />
+                    </label>
+                  </Grid>
+
+                  {/* Third Row */}
+                  <Grid item xs={6}>
+                    <FormControl fullWidth required>
+                      <InputLabel>Author</InputLabel>
+                      <Field as={Select} name="authorId" label="Author">
+                        <MenuItem value="">Select Author</MenuItem>
+                        {authors.map((author) => (
+                          <MenuItem key={author._id} value={author._id}>
+                            {author.name}
+                          </MenuItem>
+                        ))}
+                      </Field>
+                      <ErrorMessage name="authorId" component="div" />
+                    </FormControl>
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth required>
+                      <InputLabel>Genre</InputLabel>
+                      <Field as={Select} name="genreId" label="Genre">
+                        <MenuItem value="">Select Genre</MenuItem>
+                        {genres.map((genre) => (
+                          <MenuItem key={genre._id} value={genre._id}>
+                            {genre.name}
+                          </MenuItem>
+                        ))}
+                      </Field>
+                      <ErrorMessage name="genreId" component="div" />
+                    </FormControl>
+                  </Grid>
+
+                  {/* Supplier */}
+                  <Grid item xs={6}>
+                    <FormControl fullWidth required>
+                      <InputLabel>Supplier</InputLabel>
+                      <Field as={Select} name="supplierId" label="Supplier">
+                        <MenuItem value="">Select Supplier</MenuItem>
+                        {suppliers.map((supplier) => (
+                          <MenuItem key={supplier._id} value={supplier._id}>
+                            {supplier.name}
+                          </MenuItem>
+                        ))}
+                      </Field>
+                      <ErrorMessage name="supplierId" component="div" />
+                    </FormControl>
+                  </Grid>
+
+                  {/* Images */}
+                  <Grid item xs={12}>
+                    <Button variant="outlined" component="label" sx={{ borderRadius: 2, padding: '8px 16px', textTransform: 'none', fontWeight: 'bold', border: '2px dashed #9e1c63', color: '#9e1c63', '&:hover': { border: '2px solid #9e1c63' } }}>
+                      Upload Images
+                      <input type="file" hidden multiple onChange={(e) => setFieldValue('images', e.target.files)} />
+                    </Button>
+                  </Grid>
+
+                {/* Submit Button */}
+<Grid item xs={12}>
+  <Stack direction="row" justifyContent="space-between">
+    <Button 
+      type="submit" 
+      variant="contained" 
+      sx={{
+        borderRadius: 2, 
+        textTransform: 'none', 
+        padding: '8px 16px', 
+        fontWeight: 'bold', 
+        backgroundColor: '#9c27b0', // Purple color
+        '&:hover': {
+          backgroundColor: '#7b1fa2', // Darker purple on hover
+        }
+      }} 
+      disabled={isSubmitting}
+    >
+      Update Book
+    </Button>
+    <Button 
+      variant="outlined" 
+      color="error" 
+      onClick={() => navigate('/admin/books')} 
+      sx={{ 
+        borderRadius: 2, 
+        textTransform: 'none', 
+        padding: '8px 16px', 
+        '&:hover': {
+          backgroundColor: '#f48fb1', // Pink hover effect
+        },
+      }}
+    >
+      Close
+    </Button>
+  </Stack>
+</Grid>
+
+                </Grid>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+      </Modal>
     </div>
   );
 };

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, TableContainer, Paper } from '@mui/material';
 import MUIDataTable from 'mui-datatables';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import Sidebar from './Sidebar';
 import NewAuthor from './NewAuthor'; // Import NewAuthor modal
+import { FaEdit, FaTrash } from 'react-icons/fa'; // Import FaEdit and FaTrash from react-icons
 
 const AuthorList = () => {
   const [authors, setAuthors] = useState([]);
   const [selectedAuthors, setSelectedAuthors] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false); // Modal visibility state
   const [isSidebarHovered, setSidebarHovered] = useState(false); // Track sidebar hover state
+  const navigate = useNavigate(); // Use navigate hook for programmatic navigation
 
   useEffect(() => {
     fetchAuthors();
@@ -40,6 +42,16 @@ const AuthorList = () => {
     setAuthors([...authors, newAuthor]); // Add new author to the list
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`/authors/${id}`);
+      setAuthors(authors.filter((author) => author._id !== id));
+      alert('Author deleted successfully!');
+    } catch (error) {
+      console.error('Error deleting author:', error);
+    }
+  };
+
   const columns = [
     {
       name: 'name',
@@ -64,9 +76,46 @@ const AuthorList = () => {
       label: 'Actions',
       options: {
         customBodyRender: (value) => (
-          <Link to={`/admin/authors/update/${value}`} style={{ textDecoration: 'none', color: '#1976D2' }}>
-            Edit
-          </Link>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: '#e91e63', // Purple color
+                color: 'white',
+                padding: '5px 15px',
+                textTransform: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                '&:hover': {
+                  backgroundColor: '#d81b60', // Lighter purple on hover
+                },
+              }}
+              onClick={() => navigate(`/admin/authors/update/${value}`)}
+            >
+              <FaEdit style={{ fontSize: '20px' }} /> {/* Edit icon from react-icons */}
+              Edit
+            </Button>
+            <Button
+              variant="contained"
+              sx={{
+                backgroundColor: '#9e1c63', // Purple color
+                color: 'white',
+                padding: '5px 15px',
+                textTransform: 'none',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                '&:hover': {
+                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                },
+              }}
+              onClick={() => handleDelete(value)} // Replace with the delete handler for the specific author
+            >
+              <FaTrash style={{ fontSize: '20px' }} /> {/* Delete icon from react-icons */}
+              Delete
+            </Button>
+          </div>
         ),
       },
     },
@@ -124,35 +173,34 @@ const AuthorList = () => {
               Author Management
             </Typography>
             <Typography variant="body3" sx={{ color: 'gray', marginTop: 2 }}>
-            Add new authors, edit details, and view a complete list of all authors.
+              Add new authors, edit details, and view a complete list of all authors.
             </Typography>
           </Box>
 
           <Button
-              variant="contained"
-              sx={{
-                background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
-                color: 'white',
-                borderRadius: '25px',
-                padding: '10px 20px',
-                textTransform: 'none',
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                '&:hover': {
-                  background: 'linear-gradient(135deg, #c6a0e5, #9e1c63)',
-                },
-              }}
-              onClick={() => setModalVisible(true)}
-            >
-              Add New Author
-            </Button>
+            variant="contained"
+            sx={{
+              background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
+              color: 'white',
+              borderRadius: '25px',
+              padding: '10px 20px',
+              textTransform: 'none',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #c6a0e5, #9e1c63)',
+              },
+            }}
+            onClick={() => setModalVisible(true)}
+          >
+            Add New Author
+          </Button>
 
-            {isModalVisible && (
-              <NewAuthor
-                isModalVisible={isModalVisible} // Pass the correct prop
-                onClose={() => setModalVisible(false)} // Close modal
-              />
-            )}
-
+          {isModalVisible && (
+            <NewAuthor
+              isModalVisible={isModalVisible} // Pass the correct prop
+              onClose={() => setModalVisible(false)} // Close modal
+            />
+          )}
         </Box>
 
         {/* DataTable for authors */}
@@ -162,22 +210,14 @@ const AuthorList = () => {
 
         {/* Bulk delete button */}
         {selectedAuthors.length > 0 && (
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={handleBulkDelete}
-            sx={{ marginTop: 2 }}
-          >
+          <Button variant="outlined" color="error" onClick={handleBulkDelete} sx={{ marginTop: 2 }}>
             Delete Selected
           </Button>
         )}
 
         {/* Modal for adding new author */}
         {isModalVisible && (
-          <NewAuthor
-            onAddAuthor={handleAddAuthor}
-            onClose={() => setModalVisible(false)} // Close modal
-          />
+          <NewAuthor onAddAuthor={handleAddAuthor} onClose={() => setModalVisible(false)} />
         )}
       </Box>
     </Box>
@@ -185,6 +225,3 @@ const AuthorList = () => {
 };
 
 export default AuthorList;
-
-
-
