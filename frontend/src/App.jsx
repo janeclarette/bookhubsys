@@ -14,8 +14,8 @@ import BookList from './Components/Admin/BookList'; // Import BookList
 import NewBook from './Components/Admin/NewBook'; // Import NewBook
 import UpdateBook from './Components/Admin/UpdateBook'; // Import UpdateBook
 // import { AuthProvider } from './context/AuthContext';
-import Login from './Components/User/Login';
-import Register from './Components/User/Register';
+// import Login from './Components/User/Login';
+// import Register from './Components/User/Register';
 // import ProtectedRoutes from './Components/Route/ProtectedRoutes';
 import Home from './Components/Home'; 
 import Genre from './Components/Genre';
@@ -25,8 +25,20 @@ import AuthorsWorks from './Components/AuthorsWorks';
 import Sidebar from './Components/Admin/Sidebar';
 import Dashboard from './Components/Admin/Dashboard';
 
+import RegisterAdmin from './Components/Auth/RegisterAdmin';
+import LoginAdmin from './Components/Auth/LoginAdmin';
+
+
+import Login from './Components/User/Login';
+import Register from './Components/User/Register';
+import UserDashboard from './Components/User/UserDashboard';
+import Profile from './Components/User/Profile';
+import Cart from './Components/User/Cart';
 
 import './App.css';
+
+
+
 
 
 const App = () => {
@@ -50,14 +62,23 @@ const App = () => {
                 <Route path="/admin/books" element={<BookList />} /> {/* Route for BookList */}
                 <Route path="/admin/books/new" element={<NewBook />} /> {/* Route for NewBook */}
                 <Route path="/admin/books/update/:id" element={<UpdateBook />} /> {/* Route for UpdateBook */}
-                <Route path="/user/login" element={<Login />} />
-                <Route path="/user/register" element={<Register />} />
+                {/* <Route path="/user/login" element={<Login />} />
+                <Route path="/user/register" element={<Register />} /> */}
                 {/* <ProtectedRoute path="/admin" element={<AdminDashboard />} /> */}
                 <Route path="/admin" element={<Dashboard />}/>
                 <Route path="/genres" element={<Genre />} />
                 <Route path="/authors" element={<Authors />} />
                 <Route path="/authorworks/:authorId" element={<AuthorsWorks />} />
-                
+
+                <Route path="/register/admin" element={<RegisterAdmin />} />
+                <Route path="/login/admin" element={<LoginAdmin />} />
+
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/dashboard" element={<UserDashboard />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/cart" element={<Cart />} />
+
 
             </Routes>
             </div>
