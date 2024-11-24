@@ -5,16 +5,17 @@ import { Button, IconButton, Table, TableBody, TableCell, TableContainer, TableH
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import { useNavigate } from 'react-router-dom';
 
 const Cart = () => {
-  const [user, setUser] = useState(null); // Store user data
-  const [cart, setCart] = useState([]); // Store cart items
-  const [selectedItems, setSelectedItems] = useState([]); // Store selected items for bulk deletion
-  const [error, setError] = useState(''); // Store error messages
-  const [page, setPage] = useState(0); // Pagination state
-  const [rowsPerPage, setRowsPerPage] = useState(5); // Pagination rows per page
+  const navigate = useNavigate(); 
+  const [user, setUser] = useState(null);
+  const [cart, setCart] = useState([]);
+  const [selectedItems, setSelectedItems] = useState([]);
+  const [error, setError] = useState('');
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  // Fetch user profile when component mounts
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -28,13 +29,12 @@ const Cart = () => {
     fetchUserProfile();
   }, []);
 
-  // Fetch cart items when user data is available
   useEffect(() => {
     if (user) {
       const fetchCart = async () => {
         try {
           const response = await axios.get(`http://localhost:5000/api/v1/cart/${user._id}`);
-          setCart(response.data.items || []); // Set cart data
+          setCart(response.data.items || []);
         } catch (err) {
           setError('Failed to fetch cart items');
         }
@@ -44,7 +44,6 @@ const Cart = () => {
     }
   }, [user]);
 
-  // Increase the quantity of a book in the cart
   const handleIncreaseQuantity = async (bookId, quantity) => {
     try {
       await axios.patch(`http://localhost:5000/api/v1/cart/quantity`, {
@@ -58,9 +57,8 @@ const Cart = () => {
     }
   };
 
-  // Decrease the quantity of a book in the cart
   const handleDecreaseQuantity = async (bookId, quantity) => {
-    if (quantity <= 1) return; // Prevent negative quantity
+    if (quantity <= 1) return;
     try {
       await axios.patch(`http://localhost:5000/api/v1/cart/quantity`, {
         userId: user._id,
@@ -73,46 +71,36 @@ const Cart = () => {
     }
   };
 
-  // Handle bulk deletion of selected items from the cart
   const handleBulkDelete = async () => {
     try {
-      // Make a DELETE request to remove all selected items at once
       await axios.delete(`http://localhost:5000/api/v1/cart/bulk-delete`, {
         data: { userId: user._id, bookIds: selectedItems },
       });
-      // Update the cart state by removing deleted items
-      setCart(cart.filter(item => !selectedItems.includes(item.bookId._id))); 
-      setSelectedItems([]); // Clear selected items after deletion
+      setCart(cart.filter(item => !selectedItems.includes(item.bookId._id)));
+      setSelectedItems([]);
     } catch (error) {
       setError('Failed to delete selected items');
     }
   };
 
-  // Calculate the total cost of selected items in the cart
   const calculateTotal = () => {
-    // If no items are selected, return 0
-    if (selectedItems.length === 0) {
-      return 0;
-    }
+    if (selectedItems.length === 0) return 0;
 
     return cart
-      .filter(item => selectedItems.includes(item.bookId._id)) // Only selected items
+      .filter(item => selectedItems.includes(item.bookId._id))
       .reduce((total, item) => total + item.quantity * item.bookId.price, 0)
       .toFixed(2);
   };
 
-  // Handle page change in pagination
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
 
-  // Handle rows per page change in pagination
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
 
-  // Handle item selection/deselection for bulk delete
   const handleItemSelect = (bookId) => {
     setSelectedItems(prevState => 
       prevState.includes(bookId) 
@@ -127,7 +115,6 @@ const Cart = () => {
       <h2>Your Cart</h2>
       {error && <div>{error}</div>}
       
-      {/* Table to display cart items */}
       <TableContainer>
         <Table>
           <TableHead>
@@ -167,8 +154,7 @@ const Cart = () => {
           </TableBody>
         </Table>
       </TableContainer>
-      
-      {/* Pagination */}
+
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
@@ -178,8 +164,21 @@ const Cart = () => {
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
       />
-      
-      {/* Delete button */}
+
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate('/checkout', {
+          state: {
+            selectedItems: cart.filter(item => selectedItems.includes(item.bookId._id)),
+            user: user // Pass the user data
+          }
+        })}
+        disabled={selectedItems.length === 0}
+      >
+        Checkout Selected
+      </Button>
+
       <div style={{ marginTop: '20px' }}>
         <Button
           variant="contained"
@@ -191,8 +190,7 @@ const Cart = () => {
           Delete Selected
         </Button>
       </div>
-      
-      {/* Order Summary */}
+
       <div style={{ marginTop: '20px' }}>
         <h3>Order Summary</h3>
         <p>Total: {calculateTotal()}</p>

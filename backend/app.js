@@ -9,6 +9,9 @@ const supplierRoutes = require('./routes/supplier');
 const bookRoutes = require('./routes/book'); 
 const auth = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
+const checkoutRoutes = require('./routes/checkout');
+const orderRoutes = require('./routes/orderRoutes');
+
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
@@ -22,13 +25,17 @@ app.use(cors(corsOptions)); // Use this CORS configuration
 
 app.use(cookieParser());
 
+
+
+
 app.use('/api/authors', authorRoutes);
 app.use('/api/genres', genreRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/books', bookRoutes); 
 app.use('/api/v1', auth);
 app.use('/api/v1/cart', cartRoutes);
-
+app.use('/api/v1/checkout', checkoutRoutes);
+app.use('/api/v1/orders', orderRoutes);
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

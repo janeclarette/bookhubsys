@@ -10,9 +10,10 @@ import UpdateGenre from './Components/Admin/UpdateGenre';
 import SupplierList from './Components/Admin/SupplierList';
 import NewSupplier from './Components/Admin/NewSupplier';
 import UpdateSupplier from './Components/Admin/UpdateSupplier';
-import BookList from './Components/Admin/BookList'; // Import BookList
-import NewBook from './Components/Admin/NewBook'; // Import NewBook
-import UpdateBook from './Components/Admin/UpdateBook'; // Import UpdateBook
+import BookList from './Components/Admin/BookList'; 
+import NewBook from './Components/Admin/NewBook'; 
+import UpdateBook from './Components/Admin/UpdateBook'; 
+import UserList from './Components/Admin/UserList';
 // import { AuthProvider } from './context/AuthContext';
 // import Login from './Components/User/Login';
 // import Register from './Components/User/Register';
@@ -34,6 +35,7 @@ import Register from './Components/User/Register';
 import UserDashboard from './Components/User/UserDashboard';
 import Profile from './Components/User/Profile';
 import Cart from './Components/User/Cart';
+import Checkout from './Components/User/Checkout';
 
 import './App.css';
 
@@ -59,12 +61,11 @@ const App = () => {
                 <Route path="/admin/suppliers" element={<SupplierList />} />
                 <Route path="/admin/suppliers/new" element={<NewSupplier />} />
                 <Route path="/admin/suppliers/update/:id" element={<UpdateSupplier />} />
-                <Route path="/admin/books" element={<BookList />} /> {/* Route for BookList */}
-                <Route path="/admin/books/new" element={<NewBook />} /> {/* Route for NewBook */}
-                <Route path="/admin/books/update/:id" element={<UpdateBook />} /> {/* Route for UpdateBook */}
-                {/* <Route path="/user/login" element={<Login />} />
-                <Route path="/user/register" element={<Register />} /> */}
-                {/* <ProtectedRoute path="/admin" element={<AdminDashboard />} /> */}
+                <Route path="/admin/books" element={<BookList />} /> 
+                <Route path="/admin/books/new" element={<NewBook />} /> 
+                <Route path="/admin/books/update/:id" element={<UpdateBook />} /> 
+                <Route path="/admin/users" element={<UserList />} /> 
+
                 <Route path="/admin" element={<Dashboard />}/>
                 <Route path="/genres" element={<Genre />} />
                 <Route path="/authors" element={<Authors />} />
@@ -78,6 +79,7 @@ const App = () => {
                 <Route path="/dashboard" element={<UserDashboard />} />
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
 
 
             </Routes>

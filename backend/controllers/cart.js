@@ -2,6 +2,7 @@
 
 const Cart = require('../models/cart'); // Assuming you have a Cart model
 const User = require('../models/user');
+const { checkout } = require('./checkout'); 
 
 const addToCart = async (req, res) => {
     try {
@@ -112,4 +113,4 @@ const addToCart = async (req, res) => {
   
 
   
-  module.exports = { addToCart, getCart, updateQuantity, removeFromCart, bulkDelete };
+  module.exports = { addToCart, getCart, updateQuantity, removeFromCart, bulkDelete, checkout  };
