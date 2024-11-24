@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import Sidebar from './Sidebar';  // Assuming Sidebar component is in the same directory
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
@@ -12,7 +13,7 @@ const OrderList = () => {
       try {
         const response = await axios.get('http://localhost:5000/api/v1/orders/admin/orders', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,  // Add token for authentication if needed
+            Authorization: `Bearer ${localStorage.getItem('token')}`, // Add token for authentication if needed
           },
         });
         setOrders(response.data.orders);
@@ -49,54 +50,57 @@ const OrderList = () => {
   };
 
   return (
-    <div>
-      <h1>Order Management</h1>
-      {loading ? (
-        <p>Loading orders...</p>
-      ) : (
-        <table>
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>User</th>
-              <th>Books Ordered</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.map((order) => (
-              <tr key={order._id}>
-                <td>{order._id}</td>
-                <td>{order.userId.name}</td>
-                <td>
-                  {order.items.map((item) => (
-                    <div key={item._id}>
-                      <p>{item.bookId.title} (x{item.quantity})</p>
-                      <p>Price: {item.price}</p>
-                      <p>Subtotal: {item.subtotal}</p>
-                    </div>
-                  ))}
-                </td>
-                <td>
-                  <select
-                    value={status || order.orderStatus}
-                    onChange={(e) => setStatus(e.target.value)}
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Shipped">Shipped</option>
-                    <option value="Delivered">Delivered</option>
-                    <option value="Cancelled">Cancelled</option>
-                  </select>
-                </td>
-                <td>
-                  <button onClick={() => handleStatusChange(order._id)}>Update Status</button>
-                </td>
+    <div style={{ display: 'flex' }}>
+      <Sidebar onHoverChange={() => {}} />  {/* Sidebar component */}
+      <div style={{ marginLeft: '250px', padding: '20px', flex: 1 }}>
+        <h1>Order Management</h1>
+        {loading ? (
+          <p>Loading orders...</p>
+        ) : (
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>User</th>
+                <th>Books Ordered</th>
+                <th>Status</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+            </thead>
+            <tbody>
+              {orders.map((order) => (
+                <tr key={order._id}>
+                  <td>{order._id}</td>
+                  <td>{order.userId.name}</td>
+                  <td>
+                    {order.items.map((item) => (
+                      <div key={item._id}>
+                        <p>{item.bookId.title} (x{item.quantity})</p>
+                        <p>Price: {item.price}</p>
+                        <p>Subtotal: {item.subtotal}</p>
+                      </div>
+                    ))}
+                  </td>
+                  <td>
+                    <select
+                      value={status || order.orderStatus}
+                      onChange={(e) => setStatus(e.target.value)}
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Shipped">Shipped</option>
+                      <option value="Delivered">Delivered</option>
+                      <option value="Cancelled">Cancelled</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button onClick={() => handleStatusChange(order._id)}>Update Status</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };
