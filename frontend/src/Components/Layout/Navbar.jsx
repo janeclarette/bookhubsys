@@ -1,136 +1,309 @@
-// frontend/src/components/Layout/Navbar.jsx
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';  // Import useNavigate
-import { FaShoppingCart, FaSignInAlt, FaUserPlus, FaCog } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  IconButton,
+  Button,
+  Drawer,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  Box,
+  CssBaseline,
+  GlobalStyles,
+} from "@mui/material";
+import {
+  Home as HomeIcon,
+  Category as CategoryIcon,
+  Person as PersonIcon,
+  ShoppingCart as ShoppingCartIcon,
+  Login as LoginIcon,
+  Logout as LogoutIcon,
+  PersonAdd as PersonAddIcon,
+  Info as InfoIcon,
+} from "@mui/icons-material";
+
+// Import the GIF
+import bookHubIcon from "/src/assets/img/BookhubIcon.gif";
 
 const Navbar = () => {
   const [user, setUser] = useState(null);
-  const navigate = useNavigate();  // Use the navigate hook
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Get user data from localStorage
-    const loggedInUser = JSON.parse(localStorage.getItem('user'));
+    const loggedInUser = JSON.parse(localStorage.getItem("user"));
     if (loggedInUser) {
-      setUser(loggedInUser); // Set the user if found in localStorage
+      setUser(loggedInUser);
     }
   }, []);
 
   const handleLogout = () => {
-    // Remove user data from localStorage and update state
-    localStorage.removeItem('user');
+    localStorage.removeItem("user");
     setUser(null);
-    
-    // Redirect to Home after logout
-    navigate('/');  // Navigate to home page
+    navigate("/");
   };
 
   const handleCartClick = () => {
-    // Navigate to cart only if logged in
     if (!user) {
-      // If the user is not logged in, show a modal or alert
-      alert('You must log in first!');
+      alert("You must log in first!");
     } else {
-      navigate('/cart'); // Navigate to cart if user is logged in
+      navigate("/cart");
     }
   };
 
-  return (
-    <nav style={styles.navbar}>
-      <ul style={styles.navList}>
-        <li style={styles.navItem}>
-          {/* Conditionally render the "Home" link */}
-          <Link to={user ? "/dashboard" : "/"} style={styles.navLink}>
-            Home
-          </Link>
-        </li>
-        <li style={styles.navItem}>
-          <Link to="/genres" style={styles.navLink}>Genres</Link>
-        </li>
-        <li style={styles.navItem}>
-          <Link to="/authors" style={styles.navLink}>Authors</Link>
-        </li>
-        <li style={styles.navItem}>
-          <Link to="/about" style={styles.navLink}>About Us</Link>
-        </li>
-      </ul>
-      <ul style={styles.authList}>
-        <li style={styles.navItem}>
-          <span 
-            style={styles.navLink} 
-            onClick={handleCartClick} // Make sure this is clickable
-            title={user ? 'Go to Cart' : 'Log in to view cart'}
-          >
-            <FaShoppingCart /> 
-          </span>
-        </li>
-        {!user ? (
+  const toggleDrawer = (open) => () => {
+    setIsDrawerOpen(open);
+  };
+
+  const drawerContent = (
+    <Box sx={{ width: 250 }}>
+      <List>
+        <ListItem button component={Link} to={user ? "/dashboard" : "/"} >
+          <ListItemIcon>
+            <HomeIcon />
+          </ListItemIcon>
+          <ListItemText primary="Home" />
+        </ListItem>
+        <ListItem button component={Link} to="/genres">
+          <ListItemIcon>
+            <CategoryIcon />
+          </ListItemIcon>
+          <ListItemText primary="Genres" />
+        </ListItem>
+        <ListItem button component={Link} to="/authors">
+          <ListItemIcon>
+            <PersonIcon />
+          </ListItemIcon>
+          <ListItemText primary="Authors" />
+        </ListItem>
+        <ListItem button component={Link} to="/about">
+          <ListItemIcon>
+            <InfoIcon />
+          </ListItemIcon>
+          <ListItemText primary="About Us" />
+        </ListItem>
+        {user ? (
           <>
-            <li style={styles.navItem}>
-              <Link to="/login" style={styles.navLink}>
-                <FaSignInAlt /> Login
-              </Link>
-            </li>
-            <li style={styles.navItem}>
-              <Link to="/register" style={styles.navLink}>
-                <FaUserPlus /> Register
-              </Link>
-            </li>
+            <ListItem button component={Link} to="/profile">
+              <ListItemIcon>
+                <PersonIcon />
+              </ListItemIcon>
+              <ListItemText primary="Profile" />
+            </ListItem>
+            <ListItem button onClick={handleLogout}>
+              <ListItemIcon>
+                <LogoutIcon />
+              </ListItemIcon>
+              <ListItemText primary="Logout" />
+            </ListItem>
           </>
         ) : (
           <>
-            <li style={styles.navItem}>
-              <Link to="/profile" style={styles.navLink}>
-                <FaCog />
-              </Link>
-            </li>
-            <li style={styles.navItem}>
-            <button onClick={handleLogout} style={styles.logoutButton}>
-                Logout
-            </button>
-            </li>
-
+            <ListItem button component={Link} to="/login">
+              <ListItemIcon>
+                <LoginIcon />
+              </ListItemIcon>
+              <ListItemText primary="Login" />
+            </ListItem>
+            <ListItem button component={Link} to="/register">
+              <ListItemIcon>
+                <PersonAddIcon />
+              </ListItemIcon>
+              <ListItemText primary="Register" />
+            </ListItem>
           </>
         )}
-      </ul>
-    </nav>
+      </List>
+    </Box>
+  );
+
+  return (
+    <>
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          body: {
+            margin: 0,
+            padding: 0,
+            minHeight: "100vh",
+            backgroundColor: "#f4f4f4",
+            boxSizing: "border-box",
+            marginTop: -50,
+          },
+          "*": {
+            boxSizing: "border-box",
+          },
+        }}
+      />
+      <AppBar
+        position="sticky"
+        sx={{
+          background: "linear-gradient(45deg, #f84aa7, #693668)",
+          boxShadow: "none",
+          padding: 0,
+          width: "131%",
+          marginLeft: -25,
+        }}
+      >
+        <Toolbar
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: 0,
+            marginLeft: 20,
+          }}
+        >
+          {/* BookHub Icon and title */}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <img
+              src={bookHubIcon} // Use the imported GIF
+              alt="BookHub Icon"
+              style={{ width: 50, height: 70, marginRight: 8 }} // Size and margin for the icon
+            />
+            <Typography
+              variant="h5"
+              sx={{
+                fontFamily: '"Times New Roman", serif',
+                cursor: "pointer",
+              }}
+              onClick={() => navigate("/")}
+            >
+              BookHub
+            </Typography>
+          </Box>
+
+          {/* Navigation links */}
+          <Box
+            sx={{
+              display: { xs: "none", md: "flex" }, // Hide on small screens
+              justifyContent: "center", // Center-aligns the navigation links
+              alignItems: "center",
+              flexGrow: 1,
+              gap: 4, // Space between navigation buttons
+            }}
+          >
+            <Button
+              color="inherit"
+              component={Link}
+              to={user ? "/dashboard" : "/"}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#693668", // Highlight color on hover
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              Home
+            </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/genres"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#693668", // Highlight color on hover
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              Genres
+            </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/authors"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#693668", // Highlight color on hover
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              Authors
+            </Button>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/about"
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#693668", // Highlight color on hover
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              About Us
+            </Button>
+          </Box>
+
+          {/* Right-side buttons like Profile/Logout */}
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <IconButton
+              color="inherit"
+              onClick={handleCartClick}
+              sx={{
+                "&:hover": {
+                  backgroundColor: "#693668", // Highlight color on hover
+                  transition: "background-color 0.3s ease",
+                },
+              }}
+            >
+              <ShoppingCartIcon />
+            </IconButton>
+            {user ? (
+              <>
+                <Button color="inherit" component={Link} to="/profile">
+                  Profile
+                </Button>
+                <Button color="inherit" onClick={handleLogout}>
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/login"
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#693668", // Highlight color on hover
+                      transition: "background-color 0.3s ease",
+                    },
+                  }}
+                >
+                  <LoginIcon sx={{ marginRight: 1 }} />
+                  Login
+                </Button>
+                <Button
+                  color="inherit"
+                  component={Link}
+                  to="/register"
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#693668", // Highlight color on hover
+                      transition: "background-color 0.3s ease",
+                    },
+                  }}
+                >
+                  <PersonAddIcon sx={{ marginRight: 1 }} />
+                  Register
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
+      <Drawer anchor="left" open={isDrawerOpen} onClose={toggleDrawer(false)}>
+        {drawerContent}
+      </Drawer>
+    </>
   );
 };
-
-const styles = {
-    navbar: {
-        fontFamily: '"Times New Roman", serif',
-      display: 'flex',
-      justifyContent: 'space-between',
-      padding: '10px',
-      background: '#333',
-      color: '#fff',
-    },
-    navList: {
-      display: 'flex',
-      listStyle: 'none',
-    },
-    authList: {
-      display: 'flex',
-      listStyle: 'none',
-    },
-    navItem: {
-      marginRight: '20px',
-    },
-    navLink: {
-      color: '#fff',
-      textDecoration: 'none',
-      cursor: 'pointer',
-    },
-    logoutButton: {
-      background: 'none', // Remove background
-      border: 'none', // Remove border
-      color: '#fff', // Keep the text color consistent with other links
-      textDecoration: 'none', // Remove any underline
-      cursor: 'pointer', // Pointer for clickable appearance
-      fontSize: 'inherit', // Match the font size of other nav items
-      fontFamily: '"Times New Roman", serif',
-    },
-  };
-  
 
 export default Navbar;

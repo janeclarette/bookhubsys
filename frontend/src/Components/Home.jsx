@@ -1,12 +1,16 @@
+// Home.jsx
 import React, { useState, useEffect } from 'react';
-import axios from '../utils/axiosConfig'; // Axios instance for API calls
+import axios from '../utils/axiosConfig'; 
 import Navbar from './Layout/Navbar';
+import Header from './Layout/Header'; 
+import Footer from './Layout/Footer'; 
+import { CssBaseline, GlobalStyles, Box, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 
 const Home = () => {
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 100 });
-  const [showPopup, setShowPopup] = useState(false); // State for popup visibility
+  const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [showPopup, setShowPopup] = useState(false); 
 
   useEffect(() => {
     fetchBooks();
@@ -62,148 +66,155 @@ const Home = () => {
   };
 
   return (
-    <div>
+    <Box sx={styles.container}>
+      <CssBaseline />
+      <GlobalStyles
+        styles={{
+          body: {
+            margin: 0,
+            padding: 0,
+            minHeight: '100vh',
+            backgroundColor: '#f4f4f4',
+            boxSizing: 'border-box',
+            fontFamily: "'Lora', serif", // Apply the new font globally
+          },
+          '*': {
+            boxSizing: 'border-box',
+          },
+        }}
+      />
+      
       <Navbar />
-      <h1>Home - Book Collection</h1>
-
+      <Header />
+      
+      <Typography variant="h4" sx={styles.headerText}>Home - Book Collection</Typography>
       {/* Price Filter */}
-      <div style={styles.filterContainer}>
-        <label>
-          Min Price:
-          <input
-            type="number"
-            name="min"
-            value={priceRange.min}
-            onChange={handlePriceChange}
-            style={styles.filterInput}
-          />
-        </label>
-        <label>
-          Max Price:
-          <input
-            type="number"
-            name="max"
-            value={priceRange.max}
-            onChange={handlePriceChange}
-            style={styles.filterInput}
-          />
-        </label>
-      </div>
+      <Box sx={styles.filterContainer}>
+        <TextField
+          label="Min Price"
+          type="number"
+          name="min"
+          value={priceRange.min}
+          onChange={handlePriceChange}
+          sx={styles.textField}
+        />
+        <TextField
+          label="Max Price"
+          type="number"
+          name="max"
+          value={priceRange.max}
+          onChange={handlePriceChange}
+          sx={styles.textField}
+        />
+      </Box>
 
       {/* Book Grid */}
-      <div style={styles.bookGrid}>
+      <Box sx={styles.bookGrid}>
         {filteredBooks.map((book) => (
-          <div key={book._id} style={styles.bookCard}>
+          <Box key={book._id} sx={styles.bookCard}>
             <img
               src={book.imageUrl || 'https://via.placeholder.com/150'}
               alt={book.title}
               style={styles.bookImage}
             />
-            <h3>{book.title}</h3>
-            <p>Author: {book.authorName}</p>
-            <p>Price: ${book.price}</p>
-            <div>
+            <Typography variant="h6">{book.title}</Typography>
+            <Typography variant="body2">Author: {book.authorName}</Typography>
+            <Typography variant="body2">Price: ${book.price}</Typography>
+            <Box>
               <span>⭐</span>
-            </div>
-            <button onClick={() => addToCart(book._id)} style={styles.button}>
+            </Box>
+            <Button onClick={() => addToCart(book._id)} sx={styles.button}>
               Add to Cart
-            </button>
-            <button onClick={() => viewDetails(book._id)} style={styles.button}>
+            </Button>
+            <Button onClick={() => viewDetails(book._id)} sx={styles.button}>
               View Details
-            </button>
-          </div>
+            </Button>
+          </Box>
         ))}
-      </div>
+      </Box>
 
       {/* Popup Modal */}
-      {showPopup && (
-        <div style={styles.popupOverlay}>
-          <div style={styles.popup}>
-            <h2>Sign In Required</h2>
-            <p>You need to sign in or register to add items to your cart.</p>
-            <button onClick={closePopup} style={styles.closeButton}>
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      <Dialog open={showPopup} onClose={closePopup}>
+        <DialogTitle>Sign In Required</DialogTitle>
+        <DialogContent>
+          <Typography variant="body2">
+            You need to sign in or register to add items to your cart.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closePopup} sx={styles.closeButton}>
+            Close
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Footer /> {/* Include the Footer Component */}
+    </Box>
   );
 };
 
-// Styles for layout and book cards
 const styles = {
+  container: {
+    padding: 0,
+    margin: 0,
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: '100vh', // Ensure the footer stays at the bottom when content is short
+  },
   filterContainer: {
     display: 'flex',
     justifyContent: 'center',
     gap: '10px',
     marginBottom: '20px',
   },
-  filterInput: {
-    marginLeft: '10px',
-    padding: '5px',
-    border: '1px solid #ddd',
-    borderRadius: '4px',
+  textField: {
+    width: '200px',
+    '& .MuiInputBase-root': {
+      height: '40px',
+    },
+    '& .MuiInputBase-input': {
+      padding: '0 12px',
+    },
   },
   bookGrid: {
     display: 'flex',
     flexWrap: 'wrap',
     gap: '20px',
     justifyContent: 'center',
+    padding: '0 20px',
+    flexGrow: 1,
   },
   bookCard: {
-    width: '200px',
-    padding: '20px',
+    width: 200,
+    padding: 2,
     border: '1px solid #ddd',
-    borderRadius: '8px',
+    borderRadius: 2,
     textAlign: 'center',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    boxShadow: 2,
+    backgroundColor: '#fff',
   },
   bookImage: {
     width: '100%',
     height: 'auto',
-    borderRadius: '8px',
+    borderRadius: 2,
   },
   button: {
-    marginTop: '10px',
+    marginTop: 1,
     padding: '8px 12px',
-    border: 'none',
     backgroundColor: '#007BFF',
     color: '#fff',
     cursor: 'pointer',
     borderRadius: '4px',
-    marginRight: '10px',
+    marginRight: 2,
   },
-  popupOverlay: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  popup: {
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '8px',
-    textAlign: 'center',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+  headerText: {
+    marginBottom: '20px',
+    fontFamily: "'Lora', serif",
   },
   closeButton: {
-    marginTop: '20px',
-    padding: '10px 15px',
-    border: 'none',
     backgroundColor: '#007BFF',
     color: '#fff',
-    cursor: 'pointer',
-    borderRadius: '4px',
   },
 };
 
 export default Home;
-
-
-
