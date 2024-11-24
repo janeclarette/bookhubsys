@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Table, Button } from 'react-bootstrap';
+import Sidebar from './Sidebar';
+import { Box } from '@mui/material';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
+    const [sidebarHovered, setSidebarHovered] = useState(false);
 
     const fetchUsers = async () => {
         try {
@@ -44,38 +47,43 @@ const UserList = () => {
     }, []);
 
     return (
-        <div>
-            <h2>User Management</h2>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map((user) => (
-                        <tr key={user._id}>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                            <td>{user.role}</td>
-                            <td>{user.isActive ? 'Active' : 'Inactive'}</td>
-                            <td>
-                                <Button
-                                    variant={user.isActive ? 'danger' : 'success'}
-                                    onClick={() => toggleActiveStatus(user._id)}
-                                >
-                                    {user.isActive ? 'Deactivate' : 'Activate'}
-                                </Button>
-                            </td>
+        <Box display="flex" minHeight="100vh">
+            {/* Sidebar component */}
+            <Sidebar onHoverChange={setSidebarHovered} />
+
+            <Box flex={1} padding={3}>
+                <h2>User Management</h2>
+                <Table striped bordered hover>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
-        </div>
+                    </thead>
+                    <tbody>
+                        {users.map((user) => (
+                            <tr key={user._id}>
+                                <td>{user.name}</td>
+                                <td>{user.email}</td>
+                                <td>{user.role}</td>
+                                <td>{user.isActive ? 'Active' : 'Inactive'}</td>
+                                <td>
+                                    <Button
+                                        variant={user.isActive ? 'danger' : 'success'}
+                                        onClick={() => toggleActiveStatus(user._id)}
+                                    >
+                                        {user.isActive ? 'Deactivate' : 'Activate'}
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            </Box>
+        </Box>
     );
 };
 
