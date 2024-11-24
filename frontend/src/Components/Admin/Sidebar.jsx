@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt, FaUsers } from 'react-icons/fa';
+import axios from 'axios';
 import bookhubLogo from '../../assets/img/bookhublogo.png';
 import bookhubIcon from '../../assets/img/bookhubIcon.gif';
 
 const Sidebar = ({ onHoverChange }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [adminName, setAdminName] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -40,10 +42,38 @@ const Sidebar = ({ onHoverChange }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('token');
+    // Optionally, you can clear user data here without removing the token
+    setAdminName("");  // Clear admin's name on logout
     navigate('/login/admin');  // Redirect to login page
-    window.location.reload();  // Reload the page to reset the state
+    window.location.reload();  // Reload the page to update the state
   };
+
+  useEffect(() => {
+    const fetchAdminName = async () => {
+      try {
+        const token = localStorage.getItem('adminToken');  // Ensure the correct key here
+        if (!token) {
+          console.error("Token not found in localStorage.");
+          navigate('/login/admin');
+          return;
+        }
+    
+        const response = await axios.get("http://localhost:5000/api/v1/admin/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+    
+        setAdminName(response.data.name);
+      } catch (error) {
+        console.error("Failed to fetch admin details:", error.response ? error.response.data : error);
+        if (error.response && error.response.status === 401) {
+          navigate('/login/admin');
+        }
+      }
+    };
+    
+
+    fetchAdminName();
+  }, []);  // Only fetch admin name once when component mounts
 
   return (
     <div
@@ -81,7 +111,7 @@ const Sidebar = ({ onHoverChange }) => {
             }}
           />
         </div>
-        <p style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome, Admin</p>
+        {adminName && <p style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome, {adminName}</p>}
         <nav>
           <ul style={{ listStyle: 'none', padding: 0 }}>
             {[
