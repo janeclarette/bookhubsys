@@ -1,15 +1,16 @@
-// src/components/auth/RegisterUser.jsx
+// src/components/auth/registerAdmin.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const RegisterUser = () => {
+const RegisterAdmin = () => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         password: "",
-        avatar: null, // file upload state
+        avatar: null,
     });
+
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
@@ -24,35 +25,35 @@ const RegisterUser = () => {
     const handleFileChange = (e) => {
         setFormData((prev) => ({
             ...prev,
-            avatar: e.target.files[0], // Set the uploaded file to state
+            avatar: e.target.files[0],
         }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        const formDataToSend = new FormData();
-        formDataToSend.append("name", formData.name);
-        formDataToSend.append("email", formData.email);
-        formDataToSend.append("password", formData.password);
-        formDataToSend.append("avatar", formData.avatar); // Add avatar file to FormData
+        const formDataObj = new FormData();
+        formDataObj.append("name", formData.name);
+        formDataObj.append("email", formData.email);
+        formDataObj.append("password", formData.password);
+        formDataObj.append("avatar", formData.avatar);
 
         try {
             const response = await axios.post(
-                "http://localhost:5000/api/v1/register",
-                formDataToSend, 
+                "http://localhost:5000/api/v1/register/admin",
+                formDataObj,
                 { headers: { "Content-Type": "multipart/form-data" } }
             );
-            localStorage.setItem("token", response.data.token); // Save JWT token
-            navigate("/login"); // Redirect after successful registration
+            
+            navigate("/login/admin");
         } catch (err) {
-            setError(err.response?.data?.message || "Registration failed");
+            setError(err.response?.data?.message || "Something went wrong!");
         }
     };
 
     return (
         <div>
-            <h2>User Registration</h2>
+            <h2>Register Admin</h2>
             {error && <p style={{ color: "red" }}>{error}</p>}
             <form onSubmit={handleSubmit}>
                 <div>
@@ -87,12 +88,17 @@ const RegisterUser = () => {
                 </div>
                 <div>
                     <label>Avatar</label>
-                    <input type="file" name="avatar" onChange={handleFileChange} required />
+                    <input
+                        type="file"
+                        name="avatar"
+                        onChange={handleFileChange}
+                        required
+                    />
                 </div>
-                <button type="submit">Register</button>
+                <button type="submit">Register Admin</button>
             </form>
         </div>
     );
 };
 
-export default RegisterUser;
+export default RegisterAdmin;

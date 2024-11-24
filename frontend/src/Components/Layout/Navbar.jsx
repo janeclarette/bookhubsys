@@ -1,30 +1,47 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom'; // Assuming you are using React Router for navigation
-import { FaShoppingCart, FaSignInAlt, FaUserPlus } from 'react-icons/fa'; // Importing icons for login and register
-import Modal from 'react-modal'; // Importing react-modal for the popup
-
-// Ensure that you bind modal to your app element for accessibility (this can be done in the App.js or index.js file)
-Modal.setAppElement('#root');
+// frontend/src/components/Layout/Navbar.jsx
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';  // Import useNavigate
+import { FaShoppingCart, FaSignInAlt, FaUserPlus, FaCog } from 'react-icons/fa';
 
 const Navbar = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false); // State to control the modal visibility
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();  // Use the navigate hook
 
-  // Function to open the modal when cart icon is clicked
-  const openModal = () => {
-    setModalIsOpen(true);
+  useEffect(() => {
+    // Get user data from localStorage
+    const loggedInUser = JSON.parse(localStorage.getItem('user'));
+    if (loggedInUser) {
+      setUser(loggedInUser); // Set the user if found in localStorage
+    }
+  }, []);
+
+  const handleLogout = () => {
+    // Remove user data from localStorage and update state
+    localStorage.removeItem('user');
+    setUser(null);
+    
+    // Redirect to Home after logout
+    navigate('/');  // Navigate to home page
   };
 
-  // Function to close the modal
-  const closeModal = () => {
-    setModalIsOpen(false);
+  const handleCartClick = () => {
+    // Navigate to cart only if logged in
+    if (!user) {
+      // If the user is not logged in, show a modal or alert
+      alert('You must log in first!');
+    } else {
+      navigate('/cart'); // Navigate to cart if user is logged in
+    }
   };
 
   return (
     <nav style={styles.navbar}>
       <ul style={styles.navList}>
-        {/* Left side links */}
         <li style={styles.navItem}>
-          <Link to="/" style={styles.navLink}>Home</Link>
+          {/* Conditionally render the "Home" link */}
+          <Link to={user ? "/dashboard" : "/"} style={styles.navLink}>
+            Home
+          </Link>
         </li>
         <li style={styles.navItem}>
           <Link to="/genres" style={styles.navLink}>Genres</Link>
@@ -35,122 +52,85 @@ const Navbar = () => {
         <li style={styles.navItem}>
           <Link to="/about" style={styles.navLink}>About Us</Link>
         </li>
-        <li style={styles.navItem}>
-          <Link to="/popular" style={styles.navLink}>Popular</Link>
-        </li>
-        <li style={styles.navItem}>
-          <button onClick={openModal} style={styles.cartButton}>
-            <FaShoppingCart style={styles.cartIcon} />
-          </button>
-        </li>
       </ul>
-
-      {/* Right side links */}
       <ul style={styles.authList}>
         <li style={styles.navItem}>
-          <Link to="/login" style={styles.navLink}>
-            <FaSignInAlt style={styles.icon} />
-          </Link>
+          <span 
+            style={styles.navLink} 
+            onClick={handleCartClick} // Make sure this is clickable
+            title={user ? 'Go to Cart' : 'Log in to view cart'}
+          >
+            <FaShoppingCart /> 
+          </span>
         </li>
-        <li style={styles.navItem}>
-          <Link to="/register" style={styles.navLink}>
-            <FaUserPlus style={styles.icon} />
-          </Link>
-        </li>
-      </ul>
+        {!user ? (
+          <>
+            <li style={styles.navItem}>
+              <Link to="/login" style={styles.navLink}>
+                <FaSignInAlt /> Login
+              </Link>
+            </li>
+            <li style={styles.navItem}>
+              <Link to="/register" style={styles.navLink}>
+                <FaUserPlus /> Register
+              </Link>
+            </li>
+          </>
+        ) : (
+          <>
+            <li style={styles.navItem}>
+              <Link to="/profile" style={styles.navLink}>
+                <FaCog />
+              </Link>
+            </li>
+            <li style={styles.navItem}>
+            <button onClick={handleLogout} style={styles.logoutButton}>
+                Logout
+            </button>
+            </li>
 
-      {/* Modal Popup */}
-      <Modal
-        isOpen={modalIsOpen}
-        onRequestClose={closeModal}
-        contentLabel="Login/Register Required"
-        style={modalStyles}
-      >
-        <h2>Please log in or register to access your cart</h2>
-        <button onClick={closeModal} style={styles.closeModalButton}>Close</button>
-        <div>
-          <Link to="/login" style={styles.navLink}>Login</Link>
-          <span> or </span>
-          <Link to="/register" style={styles.navLink}>Register</Link>
-        </div>
-      </Modal>
+          </>
+        )}
+      </ul>
     </nav>
   );
 };
 
-// Styles for the navbar
 const styles = {
-  navbar: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '10px 20px',
-    backgroundColor: '#333',
-    color: '#fff',
-  },
-  navList: {
-    display: 'flex',
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-  },
-  authList: {
-    display: 'flex',
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-  },
-  navItem: {
-    marginRight: '30px',
-  },
-  navLink: {
-    color: '#fff',
-    textDecoration: 'none',
-    fontSize: '16px',
-    display: 'flex',
-    alignItems: 'center',
-    background: '#333',
-    color: '#fff',
-    padding: '5px 10px',
-    border: 'none',
-    cursor: 'pointer',
-    marginTop: '10px',
-  },
-  cartButton: {
-    background: 'transparent',
-    border: 'none',
-    cursor: 'pointer',
-  },
-  cartIcon: {
-    fontSize: '20px',
-  },
-  icon: {
-    marginRight: '8px',
-    fontSize: '16px',
-  },
-  closeModalButton: {
-    backgroundColor: '#333',
-    color: '#fff',
-    padding: '5px 10px',
-    border: 'none',
-    cursor: 'pointer',
-    marginTop: '10px',
-  },
-};
-
-// Styles for the modal
-const modalStyles = {
-  content: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    backgroundColor: '#fff',
-    padding: '20px',
-    borderRadius: '10px',
-    width: '300px',
-    textAlign: 'center',
-  },
-};
+    navbar: {
+        fontFamily: '"Times New Roman", serif',
+      display: 'flex',
+      justifyContent: 'space-between',
+      padding: '10px',
+      background: '#333',
+      color: '#fff',
+    },
+    navList: {
+      display: 'flex',
+      listStyle: 'none',
+    },
+    authList: {
+      display: 'flex',
+      listStyle: 'none',
+    },
+    navItem: {
+      marginRight: '20px',
+    },
+    navLink: {
+      color: '#fff',
+      textDecoration: 'none',
+      cursor: 'pointer',
+    },
+    logoutButton: {
+      background: 'none', // Remove background
+      border: 'none', // Remove border
+      color: '#fff', // Keep the text color consistent with other links
+      textDecoration: 'none', // Remove any underline
+      cursor: 'pointer', // Pointer for clickable appearance
+      fontSize: 'inherit', // Match the font size of other nav items
+      fontFamily: '"Times New Roman", serif',
+    },
+  };
+  
 
 export default Navbar;

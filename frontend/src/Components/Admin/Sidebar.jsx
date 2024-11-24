@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt } from 'react-icons/fa';
+import axios from 'axios';
 import bookhubLogo from '../../assets/img/bookhublogo.png';
 import bookhubIcon from '../../assets/img/bookhubIcon.gif';
 
 const Sidebar = ({ onHoverChange }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [adminName, setAdminName] = useState(""); // State to store admin name
   const location = useLocation();
-  const navigate = useNavigate(); // To navigate after logout
+  const navigate = useNavigate();
 
   const navItemStyle = (path) => ({
     display: 'flex',
@@ -22,10 +24,6 @@ const Sidebar = ({ onHoverChange }) => {
     transition: 'background-color 0.3s ease, color 0.3s ease',
     width: '100%',
     boxSizing: 'border-box',
-    '&:hover': {
-      background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
-      color: 'white',
-    },
   });
 
   const iconStyle = {
@@ -44,11 +42,45 @@ const Sidebar = ({ onHoverChange }) => {
   };
 
   const handleLogout = () => {
-    // Clear user authentication (this depends on your authentication setup)
-    // For example, you can clear localStorage or a token from a global state
-    localStorage.removeItem('authToken'); // Example
-    navigate('/login'); // Redirect to login page after logout
-  };
+    localStorage.removeItem('token');
+    setAdminName(""); 
+    navigate('/login/admin');
+    window.location.reload(); // Force a page reload to reset the session
+};
+
+  
+  
+  useEffect(() => {
+    const fetchAdminName = async () => {
+      try {
+        const token = localStorage.getItem('token'); // Get token from localStorage
+        if (!token) {
+          console.error("Token not found in localStorage.");
+          navigate('/login/admin'); // Redirect to login page if no token
+          return;
+        }
+  
+        console.log("Fetching admin details with token:", token); // Debug log for token
+  
+        // Sending token in Authorization header
+        const response = await axios.get("http://localhost:5000/api/v1/admin/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        setAdminName(response.data.name); // Set admin name from response
+      } catch (error) {
+        console.error("Failed to fetch admin details:", error.response ? error.response.data : error);
+        // If token is invalid or expired, redirect to login page
+        if (error.response && error.response.status === 401) {
+          navigate('/login/admin');
+        }
+      }
+    };
+  
+    fetchAdminName();
+  }, []);
+  
+  
 
   return (
     <div
@@ -74,11 +106,7 @@ const Sidebar = ({ onHoverChange }) => {
     >
       <div>
         <div style={{ display: 'flex', alignItems: 'center', marginBottom: '30px' }}>
-          <img
-            src={bookhubIcon}
-            alt="Book Hub Icon"
-            style={{ width: '60px', marginLeft: '1px' }}
-          />
+          <img src={bookhubIcon} alt="Book Hub Icon" style={{ width: '60px', marginLeft: '1px' }} />
           <img
             src={bookhubLogo}
             alt="Book Hub Logo"
@@ -89,10 +117,10 @@ const Sidebar = ({ onHoverChange }) => {
             }}
           />
         </div>
-
+        <p style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome, {adminName}</p> {/* Display admin name */}
         <nav>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {[ 
+            {[ // Define links for the sidebar
               { to: '/admin', icon: <FaTachometerAlt style={iconStyle} />, label: 'Dashboard' },
               { to: '/admin/authors', icon: <FaUser style={iconStyle} />, label: 'Author Management' },
               { to: '/admin/genres', icon: <FaLayerGroup style={iconStyle} />, label: 'Genre Management' },
