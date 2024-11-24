@@ -14,6 +14,7 @@ import BookList from './Components/Admin/BookList';
 import NewBook from './Components/Admin/NewBook'; 
 import UpdateBook from './Components/Admin/UpdateBook'; 
 import UserList from './Components/Admin/UserList';
+import OrderList from './Components/Admin/OrderList';
 // import { AuthProvider } from './context/AuthContext';
 // import Login from './Components/User/Login';
 // import Register from './Components/User/Register';
@@ -65,6 +66,7 @@ const App = () => {
                 <Route path="/admin/books/new" element={<NewBook />} /> 
                 <Route path="/admin/books/update/:id" element={<UpdateBook />} /> 
                 <Route path="/admin/users" element={<UserList />} /> 
+                <Route path="/admin/orders" element={<OrderList />} /> 
 
                 <Route path="/admin" element={<Dashboard />}/>
                 <Route path="/genres" element={<Genre />} />

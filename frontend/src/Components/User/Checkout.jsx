@@ -22,21 +22,20 @@ const Checkout = () => {
       .toFixed(2);
   };
 
-  // Handle form submission
   const handleSubmit = async () => {
     if (!address || !phoneNumber) {
       setError('Please fill in all required fields.');
       return;
     }
-
+  
     const shippingInfo = { address, phoneNumber };
     const shippingFee = 10; // Example shipping fee
-
+  
     const totalAmount = selectedItems.reduce((total, item) => {
       const itemSubtotal = item.quantity * item.bookId.price;
       return total + itemSubtotal;
-    }, 0).toFixed(2);
-
+    }, 0) + shippingFee;
+  
     try {
       // Send the order data
       await axios.post('http://localhost:5000/api/v1/orders', {
@@ -45,14 +44,14 @@ const Checkout = () => {
           bookId: item.bookId._id,
           quantity: item.quantity,
           price: item.bookId.price,
-          subtotal: item.quantity * item.bookId.price, // Send subtotal for each item
+          subtotal: item.quantity * item.bookId.price,
         })),
         shippingInfo,
         paymentMethod,
         shippingFee,
-        totalAmount,
+        totalAmount: totalAmount.toFixed(2),
       });
-
+  
       // Show success dialog
       setOpenSuccessDialog(true);
     } catch (err) {
@@ -60,6 +59,7 @@ const Checkout = () => {
       console.error('Order error:', err.response?.data);
     }
   };
+  
 
   const handleCloseDialog = () => {
     setOpenSuccessDialog(false); // Close the dialog

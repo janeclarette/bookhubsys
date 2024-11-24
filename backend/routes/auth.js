@@ -33,7 +33,7 @@ router.put('/password/reset/:token', resetPassword);
 router.post('/register/admin', upload.single('avatar'), registerAdmin); // Admin register route
 router.post('/login/admin', loginAdmin); 
 router.get('/admin/profile', isAuthenticatedUser, getAdminProfile)
-router.get('/admin/users', isAuthenticatedUser, authorizeRoles('admin'), allUsers)
+router.get('/admin/users', allUsers)
 router.route('/admin/user/:id').get(isAuthenticatedUser,  getUserDetails).put(isAuthenticatedUser, updateUser)
 
 

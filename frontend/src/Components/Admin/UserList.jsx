@@ -19,7 +19,7 @@ const UserList = () => {
         } catch (error) {
             console.error("Failed to fetch users:", error);
         }
-    };
+    };    
 
     const toggleActiveStatus = async (userId) => {
         try {

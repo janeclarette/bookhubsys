@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, Button, Form } from 'react-bootstrap';
-import Sidebar from './Sidebar';
-import { Box } from '@mui/material';
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
-  const [sidebarHovered, setSidebarHovered] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState('');
 
+  // Fetch all orders when the component mounts
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/v1/orders/admin/orders', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('token')}`,  // Add token for authentication if needed
           },
         });
         setOrders(response.data.orders);
@@ -27,20 +25,22 @@ const OrderList = () => {
     fetchOrders();
   }, []);
 
-  const handleStatusChange = async (orderId, newStatus) => {
+  const handleStatusChange = async (orderId) => {
     try {
-      await axios.put(
-        'http://localhost:5000/api/v1/admin/orders/update-status',
-        { orderId, status: newStatus },
+      const response = await axios.put(
+        'http://localhost:5000/api/v1/orders/admin/orders/update-status',
+        { orderId, status },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         }
       );
+      alert('Order status updated');
+      // Re-fetch orders after update
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
-          order._id === orderId ? { ...order, orderStatus: newStatus } : order
+          order._id === orderId ? { ...order, orderStatus: status } : order
         )
       );
     } catch (error) {
@@ -49,59 +49,55 @@ const OrderList = () => {
   };
 
   return (
-    <Box display="flex" minHeight="100vh">
-      {/* Sidebar */}
-      <Sidebar onHoverChange={setSidebarHovered} />
-
-      {/* Main Content */}
-      <Box flex={1} padding={3}>
-        <h2>Order Management</h2>
-        {loading ? (
-          <p>Loading orders...</p>
-        ) : (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Books Ordered</th>
-                <th>Status</th>
-                <th>Actions</th>
+    <div>
+      <h1>Order Management</h1>
+      {loading ? (
+        <p>Loading orders...</p>
+      ) : (
+        <table>
+          <thead>
+            <tr>
+              <th>Order ID</th>
+              <th>User</th>
+              <th>Books Ordered</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.map((order) => (
+              <tr key={order._id}>
+                <td>{order._id}</td>
+                <td>{order.userId.name}</td>
+                <td>
+                  {order.items.map((item) => (
+                    <div key={item._id}>
+                      <p>{item.bookId.title} (x{item.quantity})</p>
+                      <p>Price: {item.price}</p>
+                      <p>Subtotal: {item.subtotal}</p>
+                    </div>
+                  ))}
+                </td>
+                <td>
+                  <select
+                    value={status || order.orderStatus}
+                    onChange={(e) => setStatus(e.target.value)}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Delivered">Delivered</option>
+                    <option value="Cancelled">Cancelled</option>
+                  </select>
+                </td>
+                <td>
+                  <button onClick={() => handleStatusChange(order._id)}>Update Status</button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td>{order._id}</td>
-                  <td>{order.userId?.name || 'Unknown User'}</td>
-                  <td>
-                    {order.items.map((item) => (
-                      <div key={item._id}>
-                        <p>{item.bookId?.title || 'Unknown Title'} (x{item.quantity})</p>
-                        <p>Price: {item.price}</p>
-                        <p>Subtotal: {item.subtotal}</p>
-                      </div>
-                    ))}
-                  </td>
-                  <td>{order.orderStatus}</td>
-                  <td>
-                    <Form.Select
-                      value={order.orderStatus}
-                      onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </Form.Select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        )}
-      </Box>
-    </Box>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
   );
 };
 
