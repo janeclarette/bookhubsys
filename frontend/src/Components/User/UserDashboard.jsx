@@ -102,7 +102,7 @@ const UserDashboard = () => {
 
       {/* Header Component */}
       <Header />
-
+      <Typography variant="h4" sx={styles.headerText}>Home - Book Collection</Typography>
       {/* Price Filter */}
       <Box sx={styles.filterContainer}>
         <TextField
@@ -176,7 +176,7 @@ const styles = {
     borderBottom: '1px solid #ddd',
     boxShadow: '0 2px 5px rgba(0,0,0,0.1)',
     borderRadius: '8px',
-    marginBottom: '20px',
+    marginBottom: '10px',
     flexDirection: 'row',
     gap: '20px',
     justifyContent: 'left',
@@ -203,6 +203,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
+    marginTop: '10px', // Added margin here to move the text down
   },
   userName: {
     fontWeight: 'bold',
@@ -227,6 +228,7 @@ const styles = {
     '& .MuiInputBase-input': {
       padding: '0 12px',
     },
+    marginTop: '30px',
   },
   bookGrid: {
     display: 'flex',
