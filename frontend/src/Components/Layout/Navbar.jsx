@@ -24,6 +24,8 @@ import {
   Logout as LogoutIcon,
   PersonAdd as PersonAddIcon,
   Info as InfoIcon,
+  AccountCircle as AccountCircleIcon,  // Import Profile Icon
+  ExitToApp as ExitToAppIcon,          // Import Logout Icon
 } from "@mui/icons-material";
 
 // Import the GIF
@@ -90,13 +92,13 @@ const Navbar = () => {
           <>
             <ListItem button component={Link} to="/profile">
               <ListItemIcon>
-                <PersonIcon />
+                <AccountCircleIcon />
               </ListItemIcon>
               <ListItemText primary="Profile" />
             </ListItem>
             <ListItem button onClick={handleLogout}>
               <ListItemIcon>
-                <LogoutIcon />
+                <ExitToAppIcon />
               </ListItemIcon>
               <ListItemText primary="Logout" />
             </ListItem>
@@ -257,10 +259,21 @@ const Navbar = () => {
             </IconButton>
             {user ? (
               <>
-                <Button color="inherit" component={Link} to="/profile">
-                  Profile
-                </Button>
+                <IconButton
+                  color="inherit"
+                  component={Link}
+                  to="/profile"
+                  sx={{
+                    "&:hover": {
+                      backgroundColor: "#693668", // Highlight color on hover
+                      transition: "background-color 0.3s ease",
+                    },
+                  }}
+                >
+                  <AccountCircleIcon />
+                </IconButton>
                 <Button color="inherit" onClick={handleLogout}>
+                  <ExitToAppIcon sx={{ marginRight: 1 }} />
                   Logout
                 </Button>
               </>
