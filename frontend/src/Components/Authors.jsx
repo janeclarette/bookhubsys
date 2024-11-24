@@ -1,8 +1,8 @@
-// Authors.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
 import axios from '../utils/axiosConfig'; // Axios instance for API calls
 import Navbar from './Layout/Navbar';
+import { Box, Button, Grid, Card, CardContent, CardMedia, Typography } from '@mui/material';
 
 const Authors = () => {
   const [authors, setAuthors] = useState([]);
@@ -39,93 +39,79 @@ const Authors = () => {
   const alphabet = Array.from(Array(26), (_, i) => String.fromCharCode(65 + i));
 
   return (
-    <div>
+    <Box sx={{ padding: '20px' }}>
       <Navbar />
-      <h1>Authors</h1>
-      <div style={styles.alphabetList}>
+      
+      <Typography variant="h4" sx={{ textAlign: 'center', marginBottom: '30px', fontSize: '24px', marginTop: '50px' }}>
+        Authors
+      </Typography>
+
+      {/* Alphabet Filter */}
+      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center', marginBottom: 3 }}>
         {alphabet.map((letter) => (
-          <button
+          <Button
             key={letter}
-            style={styles.letterButton}
+            variant={selectedLetter === letter ? 'contained' : 'outlined'}
+            color="p"
             onClick={() => filterAuthorsByLetter(letter)}
+            sx={{
+              padding: '6px 12px', // Smaller padding
+              textTransform: 'uppercase',
+              borderRadius: '5px',
+              fontSize: '12px',  // Smaller font size for the alphabet filter buttons
+            
+              backgroundColor: selectedLetter === letter ? '#8e44ad' : 'transparent', // Violet color for selected
+              color: selectedLetter === letter ? '#fff' : '#8e44ad', // Violet text for unselected
+              '&:hover': {
+                backgroundColor: selectedLetter === letter ? '#8e44ad' : '#f0f0f0',
+              },
+            }}
           >
             {letter}
-          </button>
+          </Button>
         ))}
-      </div>
+      </Box>
 
-      <div style={styles.authorList}>
+      {/* Authors List */}
+      <Grid container spacing={3} justifyContent="center">
         {filteredAuthors.length === 0 ? (
-          <p>No authors found.</p>
+          <Typography variant="body1" sx={{ textAlign: 'center', color: 'gray', fontSize: '14px' }}>
+            No authors found.
+          </Typography>
         ) : (
           filteredAuthors.map((author) => (
-            <div key={author._id} style={styles.authorCard}>
-              <img
-                src={author.imagePath[0] || 'default.jpg'}
-                alt={author.name}
-                style={styles.authorImage}
-              />
-              <h3>{author.name}</h3>
-              <p>{author.bio}</p>
-              {/* Add the View Works button */}
-              <button
-                style={styles.viewWorksButton}
-                onClick={() => viewAuthorWorks(author._id)}
-              >
-                View Works
-              </button>
-            </div>
+            <Grid item key={author._id} xs={12} sm={6} md={4}>
+              <Card sx={{ maxWidth: 345, boxShadow: 3, borderRadius: 2 }}>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={author.imagePath[0] || 'default.jpg'}
+                  alt={author.name}
+                  sx={{ objectFit: 'cover', borderRadius: '8px' }}
+                />
+                <CardContent>
+                  <Typography variant="body1" sx={{ fontWeight: 'bold', fontSize: '16px', }}>
+                    {author.name}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" sx={{ height: '60px', overflow: 'hidden', fontSize: '12px', }}>
+                    {author.bio}
+                  </Typography>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ marginTop: 2, fontSize: '14px' }}
+                    onClick={() => viewAuthorWorks(author._id)}
+                  >
+                    View Works
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
           ))
         )}
-      </div>
-    </div>
+      </Grid>
+    </Box>
   );
-};
-
-const styles = {
-  alphabetList: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '10px',
-    marginBottom: '20px',
-  },
-  letterButton: {
-    backgroundColor: '#333',
-    color: '#fff',
-    padding: '10px',
-    fontSize: '16px',
-    border: 'none',
-    cursor: 'pointer',
-    borderRadius: '4px',
-  },
-  authorList: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: '20px',
-    justifyContent: 'center',
-  },
-  authorCard: {
-    width: '250px',
-    padding: '20px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    textAlign: 'center',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  },
-  authorImage: {
-    width: '100%',
-    height: 'auto',
-    borderRadius: '8px',
-  },
-  viewWorksButton: {
-    marginTop: '10px',
-    padding: '10px 15px',
-    backgroundColor: '#007BFF',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-  },
 };
 
 export default Authors;

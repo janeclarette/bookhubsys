@@ -4,7 +4,9 @@ import axios from '../utils/axiosConfig';
 import Navbar from './Layout/Navbar';
 import Header from './Layout/Header'; 
 import Footer from './Layout/Footer'; 
-import { CssBaseline, GlobalStyles, Box, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
+import { CssBaseline, GlobalStyles, Box, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 const Home = () => {
   const [books, setBooks] = useState([]);
@@ -123,12 +125,14 @@ const Home = () => {
             <Box>
               <span>⭐</span>
             </Box>
-            <Button onClick={() => addToCart(book._id)} sx={styles.button}>
-              Add to Cart
-            </Button>
-            <Button onClick={() => viewDetails(book._id)} sx={styles.button}>
-              View Details
-            </Button>
+            <Box sx={styles.buttonContainer}>
+              <IconButton onClick={() => addToCart(book._id)} sx={styles.iconButton}>
+                <AddShoppingCartIcon sx={styles.icon} />
+              </IconButton>
+              <IconButton onClick={() => viewDetails(book._id)} sx={styles.iconButton}>
+                <VisibilityIcon sx={styles.icon} />
+              </IconButton>
+            </Box>
           </Box>
         ))}
       </Box>
@@ -198,14 +202,23 @@ const styles = {
     height: 'auto',
     borderRadius: 2,
   },
-  button: {
-    marginTop: 1,
-    padding: '8px 12px',
-    backgroundColor: '#007BFF',
+  buttonContainer: {
+    display: 'flex',
+    justifyContent: 'center',
+    gap: '10px',
+    marginTop: '10px',
+  },
+  iconButton: {
+    backgroundColor: '#f5a623', // Cute yellow background
+    borderRadius: '50%',
+    padding: '10px',
+    '&:hover': {
+      backgroundColor: '#f39c12', // Darker yellow on hover
+    },
+  },
+  icon: {
+    fontSize: '24px',
     color: '#fff',
-    cursor: 'pointer',
-    borderRadius: '4px',
-    marginRight: 2,
   },
   headerText: {
     marginBottom: '20px',

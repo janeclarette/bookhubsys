@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from '../utils/axiosConfig'; // Axios instance for API calls
 import Navbar from './Layout/Navbar';
+import { Box, Typography, Checkbox, FormControlLabel, Grid, Card, CardContent, CardMedia, Button } from '@mui/material';
 
 const Genre = () => {
   const [genres, setGenres] = useState([]);
@@ -49,68 +50,133 @@ const Genre = () => {
   );
 
   return (
-    <div>
-    <Navbar /> {/* Render the Navbar here */}
-      <h1>Genres</h1>
+    <Box sx={styles.container}>
+      <Navbar /> {/* Render the Navbar here */}
+      
+      <Typography variant="h4" sx={styles.pageTitle}>Genres</Typography>
 
       {/* Genre Checkboxes */}
-      <div style={styles.genreCheckboxes}>
-        <h3>Filter by Genre:</h3>
+      <Box sx={styles.genreCheckboxes}>
+        <Typography variant="body1" sx={styles.filterTitle}>Filter by Genre:</Typography>
         {genres.map((genre) => (
-          <label key={genre._id} style={styles.genreCheckbox}>
-            <input 
-              type="checkbox" 
-              value={genre._id} 
-              onChange={handleGenreChange} 
-            />
-            {genre.name}
-          </label>
+          <FormControlLabel
+            key={genre._id}
+            control={
+              <Checkbox 
+                value={genre._id} 
+                onChange={handleGenreChange} 
+                color="primary" 
+              />
+            }
+            label={genre.name}
+            sx={styles.genreLabel}
+          />
         ))}
-      </div>
+      </Box>
 
       {/* Display Books */}
-      <h2>Books</h2>
-      <div style={styles.bookGrid}>
+      <Typography variant="h5" sx={styles.booksTitle}>Books</Typography>
+      <Grid container spacing={3}>
         {filteredBooks.map((book) => (
-          <div key={book._id} style={styles.bookCard}>
-            <img src={book.images[0]?.url || 'default.jpg'} alt={book.title} style={styles.bookImage} />
-            <h3>{book.title}</h3>
-            <p>Author: {book.authorId.name}</p>
-            <p>Price: ${book.price}</p>
-          </div>
+          <Grid item key={book._id} xs={12} sm={6} md={4}>
+            <Card sx={styles.bookCard}>
+              <CardMedia
+                component="img"
+                height="200"
+                image={book.images[0]?.url || 'default.jpg'}
+                alt={book.title}
+                sx={styles.bookImage}
+              />
+              <CardContent>
+                <Typography variant="body1" sx={styles.bookTitle}>{book.title}</Typography>
+                <Typography variant="body2" sx={styles.bookText}>
+                  Author: {book.authorId.name}
+                </Typography>
+                <Typography variant="body2" sx={styles.bookText}>
+                  Price: ${book.price}
+                </Typography>
+                <Button variant="contained" color="primary" sx={styles.bookButton}>
+                  View Details
+                </Button>
+              </CardContent>
+            </Card>
+          </Grid>
         ))}
-      </div>
-    </div>
+      </Grid>
+    </Box>
   );
 };
 
 // Styles for the component
 const styles = {
+  container: {
+    padding: '20px',
+    backgroundColor: '#f5f5f5',
+  },
+  pageTitle: {
+    textAlign: 'center',
+    marginBottom: '30px',
+       color: '#333',
+    fontSize: '26px', // Larger font size
+    marginTop: '50px',
+  },
+  filterTitle: {
+    marginBottom: '15px',
+    fontWeight: 'bold',
+    color: '#333',
+    fontSize: '17px', // Adjusted font size for the filter title
+    
+  },
   genreCheckboxes: {
-    marginBottom: '20px',
-  },
-  genreCheckbox: {
-    display: 'block',
-    marginBottom: '10px',
-  },
-  bookGrid: {
     display: 'flex',
-    flexWrap: 'wrap',
-    gap: '20px',
-    justifyContent: 'center',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    marginBottom: '30px',
+  },
+  genreLabel: {
+    fontSize: '14px', // Adjusted font size for genre labels
+   
+    fontWeight: 'normal',
+  },
+  booksTitle: {
+    textAlign: 'center',
+    marginBottom: '20px',
+    fontWeight: 'bold',
+    color: '#333',
+    fontSize: '18px', // Smaller font size for book title
   },
   bookCard: {
-    width: '200px',
-    padding: '20px',
-    border: '1px solid #ddd',
-    borderRadius: '8px',
-    textAlign: 'center',
-    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    backgroundColor: '#fff',
+    transition: 'transform 0.2s ease-in-out',
+    '&:hover': {
+      transform: 'scale(1.05)',
+    },
   },
   bookImage: {
-    width: '100%',
-    height: 'auto',
-    borderRadius: '8px',
+    objectFit: 'cover',
+    borderRadius: '10px',
+  },
+  bookButton: {
+    marginTop: '18px',
+    backgroundColor: '#800080',
+    '&:hover': {
+      backgroundColor: '#6a006a',
+    },
+  },
+  bookTitle: {
+    fontSize: '18px', // Smaller font size for book titles
+   
+    fontWeight: 'bold',
+  },
+  bookText: {
+    fontSize: '15px', // Smaller font size for book details
+   
+    color: 'textSecondary',
   },
 };
 

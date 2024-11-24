@@ -132,7 +132,7 @@ const Navbar = () => {
             minHeight: "100vh",
             backgroundColor: "#f4f4f4",
             boxSizing: "border-box",
-            marginTop: -50,
+            marginTop: -75,
           },
           "*": {
             boxSizing: "border-box",
@@ -145,7 +145,7 @@ const Navbar = () => {
           background: "linear-gradient(45deg, #f84aa7, #693668)",
           boxShadow: "none",
           padding: 0,
-          width: "131%",
+          width: "133%",
           marginLeft: -25,
         }}
       >
