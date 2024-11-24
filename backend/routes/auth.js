@@ -18,6 +18,9 @@ const { registerUser,
 } = require('../controllers/auth');
     const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
+
+const { getAllUsers, toggleUserActiveStatus } = require('../controllers/auth.js');
+
 router.post('/register', upload.single('avatar'), registerUser);
 router.post('/login', loginUser);
 router.get('/me', isAuthenticatedUser, getUserProfile)
@@ -32,4 +35,9 @@ router.post('/login/admin', loginAdmin);
 router.get('/admin/profile', isAuthenticatedUser, getAdminProfile)
 router.get('/admin/users', isAuthenticatedUser, authorizeRoles('admin'), allUsers)
 router.route('/admin/user/:id').get(isAuthenticatedUser,  getUserDetails).put(isAuthenticatedUser, updateUser)
+
+
+router.get('/admin/users', getAllUsers);
+router.patch('/admin/users/:userId/activate', toggleUserActiveStatus);
+
 module.exports = router;

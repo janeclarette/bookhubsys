@@ -36,7 +36,12 @@ const Login = () => {
         navigate("/dashboard");
       } catch (err) {
         if (err.response) {
-          setError(err.response.data.message || "Something went wrong");
+          // Check if the error indicates account deactivation
+          if (err.response.status === 403) {
+            setError("Your account has been deactivated. Please contact support.");
+          } else {
+            setError(err.response.data.message || "Something went wrong");
+          }
         } else if (err.request) {
           setError("No response from server. Check your backend configuration.");
         } else {
@@ -45,6 +50,7 @@ const Login = () => {
       }
     },
   });
+  
 
   return (
     <>

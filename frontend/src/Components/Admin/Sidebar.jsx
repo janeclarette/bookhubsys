@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt } from 'react-icons/fa';
+import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt, FaUsers } from 'react-icons/fa';
 import axios from 'axios';
 import bookhubLogo from '../../assets/img/bookhublogo.png';
 import bookhubIcon from '../../assets/img/bookhubIcon.gif';
 
 const Sidebar = ({ onHoverChange }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [adminName, setAdminName] = useState(""); // State to store admin name
+  const [adminName, setAdminName] = useState("");
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -43,44 +43,36 @@ const Sidebar = ({ onHoverChange }) => {
 
   const handleLogout = () => {
     localStorage.removeItem('token');
-    setAdminName(""); 
+    setAdminName("");
     navigate('/login/admin');
-    window.location.reload(); // Force a page reload to reset the session
-};
+    window.location.reload();
+  };
 
-  
-  
   useEffect(() => {
     const fetchAdminName = async () => {
       try {
-        const token = localStorage.getItem('token'); // Get token from localStorage
+        const token = localStorage.getItem('token');
         if (!token) {
           console.error("Token not found in localStorage.");
-          navigate('/login/admin'); // Redirect to login page if no token
+          navigate('/login/admin');
           return;
         }
-  
-        console.log("Fetching admin details with token:", token); // Debug log for token
-  
-        // Sending token in Authorization header
+
         const response = await axios.get("http://localhost:5000/api/v1/admin/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-  
-        setAdminName(response.data.name); // Set admin name from response
+
+        setAdminName(response.data.name);
       } catch (error) {
         console.error("Failed to fetch admin details:", error.response ? error.response.data : error);
-        // If token is invalid or expired, redirect to login page
         if (error.response && error.response.status === 401) {
           navigate('/login/admin');
         }
       }
     };
-  
+
     fetchAdminName();
   }, []);
-  
-  
 
   return (
     <div
@@ -117,15 +109,16 @@ const Sidebar = ({ onHoverChange }) => {
             }}
           />
         </div>
-        <p style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome, {adminName}</p> {/* Display admin name */}
+        <p style={{ textAlign: 'center', marginBottom: '20px' }}>Welcome, {adminName}</p>
         <nav>
           <ul style={{ listStyle: 'none', padding: 0 }}>
-            {[ // Define links for the sidebar
+            {[
               { to: '/admin', icon: <FaTachometerAlt style={iconStyle} />, label: 'Dashboard' },
               { to: '/admin/authors', icon: <FaUser style={iconStyle} />, label: 'Author Management' },
               { to: '/admin/genres', icon: <FaLayerGroup style={iconStyle} />, label: 'Genre Management' },
               { to: '/admin/suppliers', icon: <FaBox style={iconStyle} />, label: 'Supplier Management' },
               { to: '/admin/books', icon: <FaBook style={iconStyle} />, label: 'Book Management' },
+              { to: '/admin/users', icon: <FaUsers style={iconStyle} />, label: 'User Management' }, // Added link
             ].map(({ to, icon, label }, index) => (
               <li key={index} style={{ marginBottom: '20px' }}>
                 <Link to={to} style={navItemStyle(to)}>

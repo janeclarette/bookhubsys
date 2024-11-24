@@ -44,37 +44,39 @@ exports.registerUser = async (req, res, next) => {
 exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
-    // Checks if email and password is entered by user
+    // Checks if email and password are entered by the user
     if (!email || !password) {
-        return res.status(400).json({ error: 'Please enter email & password' })
+        return res.status(400).json({ error: 'Please enter email & password' });
     }
-  
 
-    // Finding user in database
-    // const userPass = await User.findOne({ email }).select('+password')
-    let user = await User.findOne({ email }).select('+password')
-    if (!user) {
-        return res.status(401).json({ message: 'Invalid Email or Password' })
+    try {
+        // Finding user in database
+        let user = await User.findOne({ email }).select('+password');
+
+        if (!user) {
+            return res.status(401).json({ message: 'Invalid Email or Password' });
+        }
+
+        // Check if the user is active
+        if (!user.isActive) {
+            return res.status(403).json({ message: 'Your account has been deactivated. Please contact support for assistance.' });
+        }
+
+        // Checks if the password is correct
+        const isPasswordMatched = await user.comparePassword(password);
+
+        if (!isPasswordMatched) {
+            return res.status(401).json({ message: 'Invalid Email or Password' });
+        }
+
+        // Generate token and send response
+        sendToken(user, 200, res);
+    } catch (error) {
+        console.error('Error during login:', error);
+        res.status(500).json({ message: 'Internal Server Error' });
     }
-   
+};
 
-    // Checks if password is correct or not
-    const isPasswordMatched = await user.comparePassword(password);
-
-   
-    if (!isPasswordMatched) {
-        return res.status(401).json({ message: 'Invalid Email or Password' })
-    }
-    // const token = user.getJwtToken();
-
-    //  return res.status(201).json({
-    //  	success:true,
-    //     user,
-    //  	token
-    //  });
-    //  user = await User.findOne({ email })
-    sendToken(user, 200, res)
-}
 
 exports.getUserProfile = async (req, res, next) => {
     const user = await User.findById(req.user.id);
@@ -334,3 +336,29 @@ exports.loginAdmin = async (req, res, next) => {
 };
 
 
+exports.getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find();
+        res.status(200).json({ success: true, users });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+exports.toggleUserActiveStatus = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'User not found' });
+        }
+
+        user.isActive = !user.isActive;
+        await user.save();
+
+        res.status(200).json({ success: true, isActive: user.isActive });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
