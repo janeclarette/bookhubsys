@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Chart from 'chart.js/auto';
 import { Box, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material';
-import Sidebar from './Sidebar'; // Optional: Import your Sidebar component if needed
+import Sidebar from './Sidebar';
 
 const Dashboard = () => {
   const [startDate, setStartDate] = useState('');
@@ -18,12 +18,12 @@ const Dashboard = () => {
       const response = await fetch(`http://localhost:5000/api/v1/orders/monthly-sales?${queryParams.toString()}`);
       
       if (!response.ok) {
-        const errorText = await response.text(); // Capture the raw error response
-        console.error('Error response:', errorText); // Log the error for debugging
+        const errorText = await response.text(); 
+        console.error('Error response:', errorText); 
         throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
       }
   
-      const data = await response.json(); // Parse as JSON
+      const data = await response.json(); 
   
       if (data.success) {
         const labels = data.data.map((sale) => `${sale.month}-${sale.year}`);
@@ -42,7 +42,7 @@ const Dashboard = () => {
   const renderChart = (labels, sales) => {
     const ctx = document.getElementById('salesChart').getContext('2d');
     if (chartInstance) {
-      chartInstance.destroy(); // Destroy existing chart instance to prevent overlaps
+      chartInstance.destroy(); 
     }
     const newChartInstance = new Chart(ctx, {
       type: 'bar',
@@ -50,7 +50,7 @@ const Dashboard = () => {
         labels,
         datasets: [
           {
-            label: 'Monthly Sales (in PHP)', // Change the label to 'in PHP'
+            label: 'Monthly Sales (in PHP)',
             data: sales,
             backgroundColor: 'rgba(75, 192, 192, 0.6)',
             borderColor: 'rgba(75, 192, 192, 1)',
@@ -65,11 +65,11 @@ const Dashboard = () => {
             beginAtZero: true,
             title: {
               display: true,
-              text: 'Sales (in PHP)', // Change the label for the Y-axis to Peso
+              text: 'Sales (in PHP)', 
             },
             ticks: {
               callback: function (value) {
-                // Format the y-axis ticks as Peso currency
+               
                 return '₱' + value.toLocaleString();
               },
             },

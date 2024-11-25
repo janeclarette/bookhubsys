@@ -8,7 +8,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-// Validation schema using Yup
+// Yup
 const schema = yup.object().shape({
   name: yup.string().required('Name is required').max(100, 'Name is too long'),
   bio: yup
@@ -171,9 +171,9 @@ const UpdateAuthor = () => {
                       textTransform: 'none', 
                       padding: '8px 16px', 
                       fontWeight: 'bold', 
-                      backgroundColor: '#9c27b0',  // Purple color
+                      backgroundColor: '#9c27b0',  
                       '&:hover': {
-                        backgroundColor: '#7b1fa2',  // Darker purple on hover
+                        backgroundColor: '#7b1fa2', 
                       },
                     }}
                   >
@@ -184,7 +184,7 @@ const UpdateAuthor = () => {
                     color="error" 
                     onClick={() => navigate('/admin/authors')} 
                     sx={{ borderRadius: 2, textTransform: 'none', padding: '8px 16px',  '&:hover': {
-                      backgroundColor: '#f48fb1', // Pink hover effect
+                      backgroundColor: '#f48fb1', 
                     }, }}
                   >
                     Close

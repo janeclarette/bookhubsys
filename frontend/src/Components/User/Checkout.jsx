@@ -7,15 +7,15 @@ import Navbar from '../Layout/Navbar';
 const Checkout = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { selectedItems = [], user } = location.state || {}; // Destructure the state to get user and selectedItems
+  const { selectedItems = [], user } = location.state || {};
 
   const [address, setAddress] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [error, setError] = useState('');
-  const [openSuccessDialog, setOpenSuccessDialog] = useState(false); // State to control popup visibility
+  const [openSuccessDialog, setOpenSuccessDialog] = useState(false);
 
-  // Calculate total price of all selected items
+  
   const calculateTotal = () => {
     return selectedItems
       .reduce((total, item) => total + item.quantity * item.bookId.price, 0)
@@ -29,7 +29,7 @@ const Checkout = () => {
     }
   
     const shippingInfo = { address, phoneNumber };
-    const shippingFee = 10; // Example shipping fee
+    const shippingFee = 10; 
   
     const totalAmount = selectedItems.reduce((total, item) => {
       const itemSubtotal = item.quantity * item.bookId.price;
@@ -37,7 +37,7 @@ const Checkout = () => {
     }, 0) + shippingFee;
   
     try {
-      // Send the order data
+      
       await axios.post('http://localhost:5000/api/v1/orders', {
         userId: user._id,
         items: selectedItems.map(item => ({
@@ -52,7 +52,7 @@ const Checkout = () => {
         totalAmount: totalAmount.toFixed(2),
       });
   
-      // Show success dialog
+      
       setOpenSuccessDialog(true);
     } catch (err) {
       setError('Failed to process the order. Please try again.');
@@ -62,8 +62,8 @@ const Checkout = () => {
   
 
   const handleCloseDialog = () => {
-    setOpenSuccessDialog(false); // Close the dialog
-    navigate('/dashboard'); // Redirect to dashboard
+    setOpenSuccessDialog(false); 
+    navigate('/dashboard'); 
   };
 
   return (
@@ -75,7 +75,7 @@ const Checkout = () => {
       <Paper elevation={3} style={{ padding: '20px', marginBottom: '20px' }}>
         <Typography variant="h6" gutterBottom>Order Summary</Typography>
         {selectedItems.map((item, index) => {
-          const book = item.bookId || {}; // Handle undefined bookId
+          const book = item.bookId || {};
           const itemSubtotal = item.quantity * book.price;
           return (
             <Box key={index} mb={2}>

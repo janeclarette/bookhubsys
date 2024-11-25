@@ -3,15 +3,15 @@ import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
 import { Button, Box, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import Sidebar from './Sidebar'; // Import Sidebar
-import NewBook from './NewBook'; // Import NewBook modal component
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Added icons
+import Sidebar from './Sidebar'; 
+import NewBook from './NewBook'; 
+import { FaEdit, FaTrash } from 'react-icons/fa'; 
 
 const BookList = () => {
   const [books, setBooks] = useState([]);
   const [selectedRows, setSelectedRows] = useState([]);
   const [isSidebarHovered, setSidebarHovered] = useState(false);
-  const [isNewBookModalOpen, setIsNewBookModalOpen] = useState(false); // Modal state
+  const [isNewBookModalOpen, setIsNewBookModalOpen] = useState(false); 
   const navigate = useNavigate();
 
   // Fetch books data
@@ -22,7 +22,7 @@ const BookList = () => {
         ...book,
         authorName: book.authorId ? book.authorId.name : '',
         genreName: book.genreId ? book.genreId.name : '',
-        supplierName: book.supplierId ? book.supplierId.name : '', // Updated supplier as a reference
+        supplierName: book.supplierId ? book.supplierId.name : '', 
       }));
       setBooks(books);
     } catch (error) {
@@ -34,34 +34,34 @@ const BookList = () => {
     fetchBooks();
   }, []);
 
-  // Bulk delete handler
+  
   const handleBulkDelete = async () => {
     if (window.confirm('Are you sure you want to delete selected books?')) {
       try {
         await Promise.all(
           selectedRows.map((rowIndex) => axios.delete(`/books/${books[rowIndex]._id}`))
         );
-        fetchBooks(); // Refresh book list
-        setSelectedRows([]); // Clear selected rows
+        fetchBooks();
+        setSelectedRows([]); 
       } catch (error) {
         console.error('Error deleting books:', error);
       }
     }
   };
 
-  // Single delete handler
+ 
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
         await axios.delete(`/books/${id}`);
-        fetchBooks(); // Refresh book list
+        fetchBooks(); 
       } catch (error) {
         console.error('Error deleting book:', error);
       }
     }
   };
 
-  // Define columns for the table
+
   const columns = [
     { name: 'title', label: 'Title' },
     {
@@ -77,9 +77,9 @@ const BookList = () => {
       options: {
         customBodyRender: (value) => {
           if (value == null || isNaN(value)) {
-            return '$0.00'; // Fallback if value is missing or invalid
+            return '$0.00'; 
           }
-          return `$${value.toFixed(2)}`; // Format as price
+          return `$${value.toFixed(2)}`; 
         },
       },
     },
@@ -92,12 +92,12 @@ const BookList = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: '#e91e63', // Purple color
+                backgroundColor: '#e91e63', 
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
                 '&:hover': {
-                  backgroundColor: '#d81b60', // Lighter purple on hover
+                  backgroundColor: '#d81b60',
                 },
               }}
               onClick={() => navigate(`/admin/books/update/${id}`)}
@@ -107,12 +107,12 @@ const BookList = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: '#9e1c63', // Purple color
+                backgroundColor: '#9e1c63', 
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
                 '&:hover': {
-                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                  backgroundColor: '#c6a0e5', 
                 },
               }}
               onClick={() => handleDelete(id)}

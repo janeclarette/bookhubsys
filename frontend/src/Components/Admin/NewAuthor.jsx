@@ -16,7 +16,7 @@ import * as yup from 'yup';
 import { FaTimes } from 'react-icons/fa';
 import axios from '../../utils/axiosConfig';
 
-// Validation schema with Yup
+// Yup
 const schema = yup.object().shape({
   name: yup
     .string()
@@ -42,7 +42,7 @@ const NewAuthor = ({ isModalVisible, onClose }) => {
     },
   });
 
-  // Initialize images state as an empty array instead of null
+  
   const [images, setImages] = React.useState([]);
 
   const handleFileChange = (e) => {
@@ -53,7 +53,7 @@ const NewAuthor = ({ isModalVisible, onClose }) => {
     const formData = new FormData();
     formData.append('name', data.name);
     formData.append('bio', data.bio);
-    if (images.length > 0) { // Only append images if any are selected
+    if (images.length > 0) { 
       Array.from(images).forEach((image) => formData.append('images', image));
     }
 
@@ -62,9 +62,9 @@ const NewAuthor = ({ isModalVisible, onClose }) => {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
       alert('Author created successfully!');
-      reset(); // Reset the form after successful submission
-      setImages([]); // Reset the images state to an empty array
-      onClose(); // Close modal after submission
+      reset();
+      setImages([]); 
+      onClose(); 
     } catch (error) {
       console.error('Error creating author:', error);
     }
@@ -163,9 +163,9 @@ const NewAuthor = ({ isModalVisible, onClose }) => {
                   textTransform: 'none',
                   padding: '10px 20px',
                   fontWeight: 'bold',
-                  backgroundColor: '#9e1c63', // Purple button
+                  backgroundColor: '#9e1c63',
                   '&:hover': {
-                    backgroundColor: '#7a1451', // Darker purple on hover
+                    backgroundColor: '#7a1451', 
                   },
                 }}
               >
@@ -175,8 +175,8 @@ const NewAuthor = ({ isModalVisible, onClose }) => {
                 variant="outlined"
                 color="error"
                 onClick={() => {
-                  reset(); // Clear form on close
-                  setImages([]); // Clear images state
+                  reset();
+                  setImages([]); 
                   onClose();
                 }}
                 sx={{
@@ -184,8 +184,8 @@ const NewAuthor = ({ isModalVisible, onClose }) => {
                   textTransform: 'none',
                   padding: '10px 20px',
                   '&:hover': {
-                    backgroundColor: '#f06292', // Pink hover effect
-                    borderColor: '#f06292', // Pink border on hover
+                    backgroundColor: '#f06292', 
+                    borderColor: '#f06292', 
                   },
                 }}
               >

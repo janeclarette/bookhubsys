@@ -5,7 +5,7 @@ import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
-import Header from '../Layout/Header'; // Importing the Header component
+import Header from '../Layout/Header';
 import { width } from '@mui/system';
 
 const UserDashboard = () => {
@@ -203,7 +203,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'flex-start',
-    marginTop: '10px', // Added margin here to move the text down
+    marginTop: '10px',
   },
   userName: {
     fontWeight: 'bold',

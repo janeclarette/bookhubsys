@@ -1,19 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import Sidebar from './Sidebar';  // Assuming Sidebar component is in the same directory
+import Sidebar from './Sidebar';  
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('');
 
-  // Fetch all orders when the component mounts
+  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/v1/orders/admin/orders', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Add token for authentication if needed
+            Authorization: `Bearer ${localStorage.getItem('token')}`, 
           },
         });
         setOrders(response.data.orders);
@@ -38,7 +38,7 @@ const OrderList = () => {
         }
       );
       alert('Order status updated');
-      // Re-fetch orders after update
+      // Re-fetch orders
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === orderId ? { ...order, orderStatus: status } : order

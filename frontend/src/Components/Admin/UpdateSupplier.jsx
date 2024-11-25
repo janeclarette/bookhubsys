@@ -8,7 +8,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 
-// Validation schema using Yup
+// Yup
 const schema = yup.object().shape({
   name: yup
     .string()
@@ -234,9 +234,9 @@ const UpdateSupplier = () => {
                       textTransform: 'none',
                       padding: '8px 16px',
                       fontWeight: 'bold',
-                      backgroundColor: '#9c27b0', // Purple color
+                      backgroundColor: '#9c27b0', 
                       '&:hover': {
-                        backgroundColor: '#7b1fa2', // Darker purple on hover
+                        backgroundColor: '#7b1fa2', 
                       },
                       
                     }}
@@ -252,7 +252,7 @@ const UpdateSupplier = () => {
                       textTransform: 'none',
                       padding: '8px 16px',
                       '&:hover': {
-                        backgroundColor: '#f48fb1', // Pink hover effect
+                        backgroundColor: '#f48fb1', 
                       },
                       
                     }}

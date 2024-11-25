@@ -45,12 +45,12 @@ const UserProfileEdit = () => {
       form.append('name', formData.name);
       form.append('email', formData.email);
   
-      // Only append avatar if it's selected
+     
       if (formData.avatar) {
-        form.append('avatar', formData.avatar);  // Ensure the 'avatar' is the file, not a URL or base64 string
+        form.append('avatar', formData.avatar);
       }
   
-      // Make sure to pass the FormData with the image file
+      
       const response = await axios.put('http://localhost:5000/api/v1/me/update', form, {
         withCredentials: true,
       });

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from '../utils/axiosConfig'; // Axios instance for API calls
+import axios from '../utils/axiosConfig';
 import Navbar from './Layout/Navbar';
 import { Box, Typography, Checkbox, FormControlLabel, Grid, Card, CardContent, CardMedia, Button } from '@mui/material';
 
@@ -8,13 +8,13 @@ const Genre = () => {
   const [books, setBooks] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
 
-  // Fetch genres and books data
+  
   useEffect(() => {
     fetchGenres();
     fetchBooks();
   }, []);
 
-  // Fetch genres from the backend
+  
   const fetchGenres = async () => {
     try {
       const response = await axios.get('/genres');
@@ -24,7 +24,7 @@ const Genre = () => {
     }
   };
 
-  // Fetch books from the backend
+
   const fetchBooks = async () => {
     try {
       const response = await axios.get('/books');
@@ -34,7 +34,7 @@ const Genre = () => {
     }
   };
 
-  // Handle genre checkbox change
+ 
   const handleGenreChange = (event) => {
     const genreId = event.target.value;
     if (event.target.checked) {
@@ -44,7 +44,7 @@ const Genre = () => {
     }
   };
 
-  // Filter books based on selected genres
+ 
   const filteredBooks = books.filter((book) => 
     selectedGenres.length === 0 || selectedGenres.includes(book.genreId._id)
   );
@@ -107,7 +107,7 @@ const Genre = () => {
   );
 };
 
-// Styles for the component
+
 const styles = {
   container: {
     padding: '20px',
@@ -117,14 +117,14 @@ const styles = {
     textAlign: 'center',
     marginBottom: '30px',
        color: '#333',
-    fontSize: '26px', // Larger font size
+    fontSize: '26px',
     marginTop: '50px',
   },
   filterTitle: {
     marginBottom: '15px',
     fontWeight: 'bold',
     color: '#333',
-    fontSize: '17px', // Adjusted font size for the filter title
+    fontSize: '17px',
     
   },
   genreCheckboxes: {
@@ -134,7 +134,7 @@ const styles = {
     marginBottom: '30px',
   },
   genreLabel: {
-    fontSize: '14px', // Adjusted font size for genre labels
+    fontSize: '14px',
    
     fontWeight: 'normal',
   },
@@ -143,7 +143,7 @@ const styles = {
     marginBottom: '20px',
     fontWeight: 'bold',
     color: '#333',
-    fontSize: '18px', // Smaller font size for book title
+    fontSize: '18px',
   },
   bookCard: {
     display: 'flex',
@@ -169,12 +169,12 @@ const styles = {
     },
   },
   bookTitle: {
-    fontSize: '18px', // Smaller font size for book titles
+    fontSize: '18px',
    
     fontWeight: 'bold',
   },
   bookText: {
-    fontSize: '15px', // Smaller font size for book details
+    fontSize: '15px',
    
     color: 'textSecondary',
   },

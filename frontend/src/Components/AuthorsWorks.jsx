@@ -5,7 +5,7 @@ import axios from '../utils/axiosConfig';
 import Navbar from './Layout/Navbar';
 
 const AuthorsWorks = () => {
-  const { authorId } = useParams(); // Get authorId from route parameters
+  const { authorId } = useParams();
   const [books, setBooks] = useState([]);
 
   useEffect(() => {

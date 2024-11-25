@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
-import axios from '../utils/axiosConfig'; // Axios instance for API calls
+import { useNavigate } from 'react-router-dom';
+import axios from '../utils/axiosConfig';
 import Navbar from './Layout/Navbar';
 import { Box, Button, Grid, Card, CardContent, CardMedia, Typography } from '@mui/material';
 
@@ -8,7 +8,7 @@ const Authors = () => {
   const [authors, setAuthors] = useState([]);
   const [filteredAuthors, setFilteredAuthors] = useState([]);
   const [selectedLetter, setSelectedLetter] = useState(null);
-  const navigate = useNavigate(); // Initialize useNavigate
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchAuthors();
@@ -55,13 +55,13 @@ const Authors = () => {
             color="p"
             onClick={() => filterAuthorsByLetter(letter)}
             sx={{
-              padding: '6px 12px', // Smaller padding
+              padding: '6px 12px',
               textTransform: 'uppercase',
               borderRadius: '5px',
-              fontSize: '12px',  // Smaller font size for the alphabet filter buttons
+              fontSize: '12px',
             
-              backgroundColor: selectedLetter === letter ? '#8e44ad' : 'transparent', // Violet color for selected
-              color: selectedLetter === letter ? '#fff' : '#8e44ad', // Violet text for unselected
+              backgroundColor: selectedLetter === letter ? '#8e44ad' : 'transparent',
+              color: selectedLetter === letter ? '#fff' : '#8e44ad',
               '&:hover': {
                 backgroundColor: selectedLetter === letter ? '#8e44ad' : '#f0f0f0',
               },

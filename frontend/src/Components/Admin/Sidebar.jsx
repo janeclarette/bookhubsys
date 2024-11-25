@@ -42,16 +42,16 @@ const Sidebar = ({ onHoverChange }) => {
   };
 
   const handleLogout = () => {
-    // Optionally, you can clear user data here without removing the token
-    setAdminName("");  // Clear admin's name on logout
-    navigate('/login/admin');  // Redirect to login page
-    window.location.reload();  // Reload the page to update the state
+    
+    setAdminName("");  
+    navigate('/login/admin'); 
+    window.location.reload();  
   };
 
   useEffect(() => {
     const fetchAdminName = async () => {
       try {
-        const token = localStorage.getItem('adminToken');  // Ensure the correct key here
+        const token = localStorage.getItem('adminToken');  
         if (!token) {
           console.error("Token not found in localStorage.");
           navigate('/login/admin');
@@ -73,7 +73,7 @@ const Sidebar = ({ onHoverChange }) => {
     
 
     fetchAdminName();
-  }, []);  // Only fetch admin name once when component mounts
+  }, []);  
 
   return (
     <div
@@ -93,7 +93,7 @@ const Sidebar = ({ onHoverChange }) => {
         boxShadow: '2px 0 5px rgba(0, 0, 0, 0.5)',
         zIndex: 1000,
         transition: 'width 0.3s ease',
-        overflowY: 'auto', // Enables vertical scrolling
+        overflowY: 'auto', 
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

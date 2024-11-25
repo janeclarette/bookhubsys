@@ -6,7 +6,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { FaTimes } from 'react-icons/fa';
 
-// Validation schema with Yup
+// Yup
 const schema = yup.object().shape({
   name: yup.string().required('Genre name is required').min(3, 'Genre name must be at least 3 characters'),
 });
@@ -87,9 +87,9 @@ const NewGenre = ({ isModalVisible, onClose }) => {
                   textTransform: 'none',
                   padding: '10px 20px',
                   fontWeight: 'bold',
-                  backgroundColor: '#9e1c63', // Purple button
+                  backgroundColor: '#9e1c63', 
                   '&:hover': {
-                    backgroundColor: '#7a1451', // Darker purple on hover
+                    backgroundColor: '#7a1451', 
                   },
                 }}
               >
@@ -99,7 +99,7 @@ const NewGenre = ({ isModalVisible, onClose }) => {
                 variant="outlined"
                 color="error"
                 onClick={() => {
-                  reset(); // Clear form on close
+                  reset(); 
                   onClose();
                 }}
                 sx={{
@@ -107,8 +107,8 @@ const NewGenre = ({ isModalVisible, onClose }) => {
                   textTransform: 'none',
                   padding: '10px 20px',
                   '&:hover': {
-                    backgroundColor: '#f06292', // Pink hover effect
-                    borderColor: '#f06292', // Pink border on hover
+                    backgroundColor: '#f06292',
+                    borderColor: '#f06292', 
                   },
                 }}
               >

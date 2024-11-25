@@ -4,15 +4,15 @@ import MUIDataTable from 'mui-datatables';
 import { useNavigate } from 'react-router-dom';
 import axios from '../../utils/axiosConfig';
 import Sidebar from './Sidebar';
-import NewAuthor from './NewAuthor'; // Import NewAuthor modal
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Import FaEdit and FaTrash from react-icons
+import NewAuthor from './NewAuthor';
+import { FaEdit, FaTrash } from 'react-icons/fa'; 
 
 const AuthorList = () => {
   const [authors, setAuthors] = useState([]);
   const [selectedAuthors, setSelectedAuthors] = useState([]);
-  const [isModalVisible, setModalVisible] = useState(false); // Modal visibility state
-  const [isSidebarHovered, setSidebarHovered] = useState(false); // Track sidebar hover state
-  const navigate = useNavigate(); // Use navigate hook for programmatic navigation
+  const [isModalVisible, setModalVisible] = useState(false); 
+  const [isSidebarHovered, setSidebarHovered] = useState(false); 
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     fetchAuthors();
@@ -39,7 +39,7 @@ const AuthorList = () => {
   };
 
   const handleAddAuthor = (newAuthor) => {
-    setAuthors([...authors, newAuthor]); // Add new author to the list
+    setAuthors([...authors, newAuthor]); 
   };
 
   const handleDelete = async (id) => {
@@ -61,14 +61,14 @@ const AuthorList = () => {
       name: 'bio',
       label: 'Bio',
       options: {
-        display: false, // Hides bio in the main table, shown in expandable row
+        display: false, 
       },
     },
     {
       name: 'imagePath',
       label: 'Images',
       options: {
-        display: false, // Images shown in expandable row
+        display: false, 
       },
     },
     {
@@ -80,7 +80,7 @@ const AuthorList = () => {
             <Button
               variant="contained"
               sx={{
-                backgroundColor: '#e91e63', // Purple color
+                backgroundColor: '#e91e63', 
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
@@ -88,18 +88,18 @@ const AuthorList = () => {
                 alignItems: 'center',
                 gap: '8px',
                 '&:hover': {
-                  backgroundColor: '#d81b60', // Lighter purple on hover
+                  backgroundColor: '#d81b60', 
                 },
               }}
               onClick={() => navigate(`/admin/authors/update/${value}`)}
             >
-              <FaEdit style={{ fontSize: '20px' }} /> {/* Edit icon from react-icons */}
+              <FaEdit style={{ fontSize: '20px' }} /> 
               Edit
             </Button>
             <Button
               variant="contained"
               sx={{
-                backgroundColor: '#9e1c63', // Purple color
+                backgroundColor: '#9e1c63', 
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
@@ -107,12 +107,12 @@ const AuthorList = () => {
                 alignItems: 'center',
                 gap: '8px',
                 '&:hover': {
-                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                  backgroundColor: '#c6a0e5', 
                 },
               }}
-              onClick={() => handleDelete(value)} // Replace with the delete handler for the specific author
+              onClick={() => handleDelete(value)} 
             >
-              <FaTrash style={{ fontSize: '20px' }} /> {/* Delete icon from react-icons */}
+              <FaTrash style={{ fontSize: '20px' }} /> 
               Delete
             </Button>
           </div>
@@ -160,7 +160,7 @@ const AuthorList = () => {
       {/* Main content area */}
       <Box
         style={{
-          marginLeft: isSidebarHovered ? '250px' : '60px', // Adjust content position based on sidebar hover state
+          marginLeft: isSidebarHovered ? '250px' : '60px', 
           transition: 'margin-left 0.3s ease',
           padding: '20px',
           width: '100%',
@@ -197,8 +197,8 @@ const AuthorList = () => {
 
           {isModalVisible && (
             <NewAuthor
-              isModalVisible={isModalVisible} // Pass the correct prop
-              onClose={() => setModalVisible(false)} // Close modal
+              isModalVisible={isModalVisible} 
+              onClose={() => setModalVisible(false)} 
             />
           )}
         </Box>

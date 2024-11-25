@@ -4,14 +4,13 @@ import axios from '../../utils/axiosConfig';
 import MUIDataTable from 'mui-datatables';
 import Sidebar from './Sidebar';
 import { Box, Button, Typography, Paper, TableContainer } from '@mui/material';
-import { FaEdit, FaTrash } from 'react-icons/fa'; // Import the icons
-import NewGenre from './NewGenre'; // Import the NewGenre modal component
-
+import { FaEdit, FaTrash } from 'react-icons/fa'; 
+import NewGenre from './NewGenre'; 
 const GenreList = () => {
   const [genres, setGenres] = useState([]);
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [isSidebarHovered, setSidebarHovered] = useState(false);
-  const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
+  const [isModalVisible, setIsModalVisible] = useState(false); 
 
   useEffect(() => {
     fetchGenres();
@@ -57,12 +56,12 @@ const GenreList = () => {
               <Button
                 variant="contained"
                 sx={{
-                  backgroundColor: '#e91e63', // Pink color
+                  backgroundColor: '#e91e63', 
                   color: 'white',
                   padding: '5px 15px',
                   textTransform: 'none',
                   '&:hover': {
-                    backgroundColor: '#d81b60', // Darker pink on hover
+                    backgroundColor: '#d81b60', 
                   },
                 }}
               >
@@ -73,12 +72,12 @@ const GenreList = () => {
               onClick={() => deleteGenre(value)}
               variant="contained"
               sx={{
-                backgroundColor: '#9e1c63', // Purple color
+                backgroundColor: '#9e1c63', 
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
                 '&:hover': {
-                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                  backgroundColor: '#c6a0e5', 
                 },
               }}
             >
@@ -136,7 +135,7 @@ const GenreList = () => {
 
           <Button
             variant="contained"
-            onClick={() => setIsModalVisible(true)} // Open the modal
+            onClick={() => setIsModalVisible(true)} 
             sx={{
               background: 'linear-gradient(135deg, #9e1c63, #c6a0e5)',
               color: 'white',

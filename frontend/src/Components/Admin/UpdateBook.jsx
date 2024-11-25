@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 import { Box, Button, TextField, Modal, Typography, Paper, Grid, Stack, Divider, IconButton, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { FaTimes } from 'react-icons/fa';
 
-// Validation schema
+// Validation 
 const validationSchema = Yup.object({
   title: Yup.string().required('Title is required'),
   publicationDate: Yup.date().required('Publication date is required'),
@@ -200,9 +200,9 @@ const UpdateBook = () => {
         textTransform: 'none', 
         padding: '8px 16px', 
         fontWeight: 'bold', 
-        backgroundColor: '#9c27b0', // Purple color
+        backgroundColor: '#9c27b0', 
         '&:hover': {
-          backgroundColor: '#7b1fa2', // Darker purple on hover
+          backgroundColor: '#7b1fa2',
         }
       }} 
       disabled={isSubmitting}
@@ -218,7 +218,7 @@ const UpdateBook = () => {
         textTransform: 'none', 
         padding: '8px 16px', 
         '&:hover': {
-          backgroundColor: '#f48fb1', // Pink hover effect
+          backgroundColor: '#f48fb1',
         },
       }}
     >

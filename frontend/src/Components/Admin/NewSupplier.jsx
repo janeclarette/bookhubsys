@@ -17,7 +17,8 @@ import axios from '../../utils/axiosConfig';
 import { FaTimes } from 'react-icons/fa';
 
 const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
-  // Define validation schema with Yup
+
+  //  Yup
   const schema = yup.object().shape({
     name: yup.string().required('Supplier Name is required'),
     contactInfo: yup
@@ -30,7 +31,7 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
       .test('fileCount', 'At least one image is required', (value) => value && value.length > 0),
   });
 
-  // Initialize React Hook Form
+  //  React Hook Form
   const {
     control,
     handleSubmit,
@@ -67,8 +68,8 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
       });
       alert('Supplier created successfully!');
       reset();
-      onSupplierCreated(); // Notify parent to refresh the supplier list
-      onClose(); // Close the modal
+      onSupplierCreated(); 
+      onClose(); 
     } catch (error) {
       console.error('Error creating supplier:', error);
     }
@@ -193,9 +194,9 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
                   textTransform: 'none',
                   padding: '10px 20px',
                   fontWeight: 'bold',
-                  backgroundColor: '#9c27b0', // Purple color
+                  backgroundColor: '#9c27b0', 
                   '&:hover': {
-                    backgroundColor: '#7b1fa2', // Darker purple on hover
+                    backgroundColor: '#7b1fa2',
                   },
                 }}
               >
@@ -210,8 +211,8 @@ const NewSupplier = ({ open, onClose, onSupplierCreated }) => {
                   textTransform: 'none',
                   padding: '10px 20px',
                   '&:hover': {
-                    backgroundColor: '#f06292', // Pink hover effect
-                    borderColor: '#f06292', // Pink border on hover
+                    backgroundColor: '#f06292', 
+                    borderColor: '#f06292', 
                   },
                 }}
               >

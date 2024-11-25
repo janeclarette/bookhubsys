@@ -165,7 +165,7 @@ const styles = {
     margin: 0,
     display: 'flex',
     flexDirection: 'column',
-    minHeight: '100vh', // Ensure the footer stays at the bottom when content is short
+    minHeight: '100vh', 
   },
   filterContainer: {
     display: 'flex',
@@ -211,11 +211,11 @@ const styles = {
     marginTop: '10px',
   },
   iconButton: {
-    backgroundColor: '#f5a623', // Cute yellow background
+    backgroundColor: '#f5a623',
     borderRadius: '50%',
     padding: '10px',
     '&:hover': {
-      backgroundColor: '#f39c12', // Darker yellow on hover
+      backgroundColor: '#f39c12',
     },
   },
   icon: {

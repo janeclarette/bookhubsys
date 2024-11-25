@@ -2,16 +2,16 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Box, Container, Typography, TextField, Button, Alert, CssBaseline, GlobalStyles } from "@mui/material";
-import { Twitter, Facebook, Google } from "@mui/icons-material"; // Import icons
-import { useFormik } from "formik"; // Import Formik
-import * as Yup from "yup"; // Import Yup for validation
-import b1Gif from "/src/assets/img/b2.gif"; // Import the GIF
+import { Twitter, Facebook, Google } from "@mui/icons-material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import b1Gif from "/src/assets/img/b2.gif";
 
 const LoginAdmin = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
 
-  // Validation schema using Yup
+  // Yup
   const validationSchema = Yup.object({
     email: Yup.string().email("Invalid email format").required("Email is required"),
     password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
@@ -31,7 +31,7 @@ const LoginAdmin = () => {
           values,
           { withCredentials: true }
         );
-        // Store token or admin info in localStorage
+        
         localStorage.setItem("adminToken", response.data.token);
         navigate("/admin");
       } catch (err) {

@@ -12,10 +12,10 @@ import {
   CssBaseline,
   GlobalStyles,
 } from "@mui/material";
-import { CloudUpload, Twitter, Facebook, Google } from "@mui/icons-material"; // Icons
+import { CloudUpload, Twitter, Facebook, Google } from "@mui/icons-material"; 
 import { useFormik } from "formik";
-import * as Yup from "yup"; // Yup for validation
-import b1Gif from "/src/assets/img/b1.gif"; // Import the GIF
+import * as Yup from "yup"; // Yup
+import b1Gif from "/src/assets/img/b1.gif"; 
 
 const RegisterAdmin = () => {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ const RegisterAdmin = () => {
     email: Yup.string().email("Invalid email format").required("Email is required"),
     password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
     avatar: Yup.mixed().required("Avatar is required").test("fileSize", "File is too large", (value) => {
-      return value && value.size <= 1048576; // 1MB limit
+      return value && value.size <= 1048576; 
     }),
   });
 
@@ -219,9 +219,9 @@ const RegisterAdmin = () => {
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            backgroundImage: `url('/src/assets/img/sil.png')`, // Set the image as background
-            backgroundSize: "cover", // Ensures the image covers the area
-            backgroundPosition: "center", // Centers the image
+            backgroundImage: `url('/src/assets/img/sil.png')`, 
+            backgroundSize: "cover", 
+            backgroundPosition: "center", 
             marginLeft: 4,
           }}
         >

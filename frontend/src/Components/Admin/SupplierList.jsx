@@ -5,13 +5,13 @@ import Sidebar from './Sidebar';
 import { Box, Button, Typography } from '@mui/material';
 import NewSupplier from './NewSupplier';
 import { FaTrash, FaEdit } from 'react-icons/fa';
-import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { useNavigate } from 'react-router-dom'; 
 
 const SupplierList = () => {
   const [suppliers, setSuppliers] = useState([]);
   const [isSidebarHovered, setSidebarHovered] = useState(false);
   const [openModal, setOpenModal] = useState(false);
-  const navigate = useNavigate(); // Hook to navigate
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     fetchSuppliers();
@@ -31,7 +31,7 @@ const SupplierList = () => {
       try {
         await axios.delete(`/suppliers/${id}`);
         alert('Supplier deleted successfully!');
-        fetchSuppliers(); // Refresh the list after deletion
+        fetchSuppliers(); 
       } catch (error) {
         console.error('Error deleting supplier:', error);
         alert('Failed to delete the supplier.');
@@ -40,7 +40,7 @@ const SupplierList = () => {
   };
 
   const editSupplier = (id) => {
-    navigate(`/admin/suppliers/update/${id}`); // Navigate to the update supplier page with the supplier ID
+    navigate(`/admin/suppliers/update/${id}`); 
   };
 
   const columns = [
@@ -56,16 +56,16 @@ const SupplierList = () => {
           <div>
             <Button
               variant="contained"
-              onClick={() => editSupplier(value)} // Edit button click handler
+              onClick={() => editSupplier(value)} 
               sx={{
-                backgroundColor:  '#e91e63', // Green color for edit
+                backgroundColor:  '#e91e63', 
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
                 borderRadius: '5px',
-                marginRight: '10px', // Add some space between the buttons
+                marginRight: '10px', 
                 '&:hover': {
-                  backgroundColor: '#d81b60', // Lighter green on hover
+                  backgroundColor: '#d81b60', 
                 },
               }}
             >
@@ -76,13 +76,13 @@ const SupplierList = () => {
               variant="contained"
               onClick={() => deleteSupplier(value)}
               sx={{
-                backgroundColor: '#9e1c63', // Purple color for delete
+                backgroundColor: '#9e1c63',
                 color: 'white',
                 padding: '5px 15px',
                 textTransform: 'none',
                 borderRadius: '5px',
                 '&:hover': {
-                  backgroundColor: '#c6a0e5', // Lighter purple on hover
+                  backgroundColor: '#c6a0e5', 
                 },
               }}
             >
