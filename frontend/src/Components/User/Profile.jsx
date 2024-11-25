@@ -1,17 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { NavLink, Routes, Route } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../Layout/Navbar';
 
-const UserProfile = () => {
+const UserProfileEdit = () => {
   const [user, setUser] = useState(null);
+  const [formData, setFormData] = useState({ name: '', email: '', avatar: '' });
   const [error, setError] = useState('');
+  const [avatarPreview, setAvatarPreview] = useState('');
 
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/v1/me', { withCredentials: true });
         setUser(response.data.user);
+        setFormData({
+          name: response.data.user.name,
+          email: response.data.user.email,
+          avatar: response.data.user.avatar?.url || '',
+        });
+        setAvatarPreview(response.data.user.avatar?.url || '');
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch user profile');
       }
@@ -20,6 +27,45 @@ const UserProfile = () => {
     fetchUserProfile();
   }, []);
 
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === 'avatar') {
+      setAvatarPreview(URL.createObjectURL(files[0]));
+      setFormData({ ...formData, avatar: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    try {
+      const form = new FormData();
+      form.append('name', formData.name);
+      form.append('email', formData.email);
+  
+      // Only append avatar if it's selected
+      if (formData.avatar) {
+        form.append('avatar', formData.avatar);  // Ensure the 'avatar' is the file, not a URL or base64 string
+      }
+  
+      // Make sure to pass the FormData with the image file
+      const response = await axios.put('http://localhost:5000/api/v1/me/update', form, {
+        withCredentials: true,
+      });
+  
+      alert('Profile updated successfully');
+      setUser(response.data.user);
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      setError(err.response?.data?.message || 'Failed to update profile');
+    }
+  };
+  
+  
+  
+
   if (error) {
     return <div style={styles.error}>{error}</div>;
   }
@@ -27,95 +73,56 @@ const UserProfile = () => {
   return (
     <div style={styles.page}>
       <Navbar />
-            {/* Sub-navbar for order statuses */}
-        <div style={styles.subNavbar}>
-        <NavLink to="pending" style={styles.navLink} activeStyle={styles.activeNavLink}>
-          Pending
-        </NavLink>
-        <NavLink to="shipped" style={styles.navLink} activeStyle={styles.activeNavLink}>
-          Shipped
-        </NavLink>
-        <NavLink to="delivered" style={styles.navLink} activeStyle={styles.activeNavLink}>
-          Delivered
-        </NavLink>
-        <NavLink to="cancelled" style={styles.navLink} activeStyle={styles.activeNavLink}>
-          Cancelled
-        </NavLink>
-      </div>
-      
       <div style={styles.container}>
-        <h2 style={styles.title}>User Profile</h2>
+        <h2 style={styles.title}>Edit Profile</h2>
         {user ? (
-          <div style={styles.userInfo}>
-            <img src={user.avatar?.url} alt="User Avatar" style={styles.avatar} />
-            <div style={styles.details}>
-              <h3 style={styles.name}>{user.name}</h3>
-              <p style={styles.email}>Email: {user.email}</p>
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            <div style={styles.userInfo}>
+              <img
+                src={avatarPreview}
+                alt="User Avatar"
+                style={styles.avatar}
+              />
+              <input
+                type="file"
+                name="avatar"
+                accept="image/*"
+                onChange={handleChange}
+                style={styles.input}
+              />
             </div>
-          </div>
+            <div style={styles.details}>
+              <label style={styles.label}>Name:</label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                style={styles.input}
+              />
+              <label style={styles.label}>Email:</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                style={styles.input}
+              />
+            </div>
+            <button type="submit" style={styles.submitButton}>Update Profile</button>
+          </form>
         ) : (
           <p style={styles.loading}>Loading user information...</p>
         )}
       </div>
-
-
-
-      {/* Routes for order statuses */}
-      <div style={styles.statusContainer}>
-        <Routes>
-          <Route path="pending" element={<OrderStatus status="Pending" />} />
-          <Route path="shipped" element={<OrderStatus status="Shipped" />} />
-          <Route path="delivered" element={<OrderStatus status="Delivered" />} />
-          <Route path="cancelled" element={<OrderStatus status="Cancelled" />} />
-        </Routes>
-      </div>
-    </div>
-  );
-};
-
-// Component to display orders by status
-const OrderStatus = ({ status }) => {
-  const [orders, setOrders] = useState([]);
-  const [error, setError] = useState('');
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5000/api/v1/orders?status=${status}`, { withCredentials: true });
-        setOrders(response.data.orders);
-      } catch (err) {
-        setError(err.response?.data?.message || 'Failed to fetch orders');
-      }
-    };
-
-    fetchOrders();
-  }, [status]);
-
-  if (error) {
-    return <div style={styles.error}>{error}</div>;
-  }
-
-  return (
-    <div>
-      <h3 style={styles.statusTitle}>{status} Orders</h3>
-      {orders.length > 0 ? (
-        <ul style={styles.orderList}>
-          {orders.map(order => (
-            <li key={order._id} style={styles.orderItem}>
-              <strong>Order ID:</strong> {order._id} <br />
-              <strong>Total:</strong> ${order.totalAmount} <br />
-              <strong>Date:</strong> {new Date(order.createdAt).toLocaleDateString()}
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p style={styles.noOrders}>No {status.toLowerCase()} orders found.</p>
-      )}
     </div>
   );
 };
 
 const styles = {
+  page: {
+    padding: '20px',
+  },
   container: {
     backgroundColor: '#f9f9f9',
     boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
@@ -146,58 +153,27 @@ const styles = {
   details: {
     textAlign: 'center',
   },
-  name: {
-    fontSize: '20px',
-    fontWeight: '600',
+  label: {
+    fontSize: '16px',
     color: '#444',
     marginBottom: '10px',
   },
-  email: {
+  input: {
+    padding: '10px',
     fontSize: '16px',
-    color: '#666',
-  },
-  subNavbar: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '20px',
-    marginTop: '20px',
-    padding: '10px 0',
-    borderTop: '1px solid #ddd',
-    borderBottom: '1px solid #ddd',
-  },
-  navLink: {
-    textDecoration: 'none',
-    color: '#666',
-    fontSize: '16px',
-    fontWeight: '500',
-  },
-  activeNavLink: {
-    color: '#007bff',
-    fontWeight: 'bold',
-    borderBottom: '2px solid #007bff',
-  },
-  statusContainer: {
-    marginTop: '20px',
-  },
-  statusTitle: {
-    fontSize: '20px',
-    fontWeight: 'bold',
-    marginBottom: '10px',
-  },
-  orderList: {
-    listStyle: 'none',
-    padding: 0,
-  },
-  orderItem: {
-    backgroundColor: '#fff',
-    border: '1px solid #ddd',
+    width: '100%',
+    maxWidth: '300px',
+    margin: '10px 0',
     borderRadius: '5px',
-    padding: '15px',
-    marginBottom: '10px',
+    border: '1px solid #ccc',
   },
-  noOrders: {
-    fontSize: '16px',
-    color: '#666',
+  submitButton: {
+    padding: '10px 20px',
+    backgroundColor: '#4CAF50',
+    color: 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   },
   error: {
     color: '#d9534f',
@@ -211,4 +187,4 @@ const styles = {
   },
 };
 
-export default UserProfile;
+export default UserProfileEdit;

@@ -88,45 +88,58 @@ exports.getUserProfile = async (req, res, next) => {
 }
 
 exports.updateProfile = async (req, res, next) => {
-   console.log(req.body.email)
-    const newUserData = {
+    try {
+      const newUserData = {
         name: req.body.name,
-        email: req.body.email
-    }
-
-    // Update avatar
-    if (req.body.avatar !== '') {
-        let user = await User.findById(req.user.id)
-        // console.log(user)
-        const image_id = user.avatar.public_id;
-        // const res = await cloudinary.v2.uploader.destroy(image_id);
-        // console.log("Res", res)
-        const result = await cloudinary.v2.uploader.upload(req.body.avatar, {
-            folder: 'avatars',
-            width: 150,
-            crop: "scale"
-        },  (err, res) => {
-            console.log(err, res);
-        })
-
-        newUserData.avatar = {
-            public_id: result.public_id,
-            url: result.secure_url
+        email: req.body.email,
+      };
+  
+      // Handle avatar update if provided
+      if (req.file) { // Assuming `multer` middleware is handling file uploads
+        const user = await User.findById(req.user.id);
+  
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
         }
+  
+        // Delete old avatar from Cloudinary if exists
+        if (user.avatar && user.avatar.public_id) {
+          await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+        }
+  
+        // Upload new avatar to Cloudinary
+        const result = await cloudinary.v2.uploader.upload(req.file.path, {
+          folder: 'avatars',
+          width: 150,
+          crop: 'scale',
+        });
+  
+        newUserData.avatar = {
+          public_id: result.public_id,
+          url: result.secure_url,
+        };
+      }
+  
+      const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
+        new: true, // Return the updated document
+        runValidators: true, // Validate the updated data
+      });
+  
+      if (!user) {
+        return res.status(400).json({ message: 'Failed to update user profile' });
+      }
+  
+      res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      res.status(500).json({ message: 'Server error during profile update' });
     }
-
-    const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
-        new: true,
-        runValidators: true,
-    })
-    if (!user) {
-        return res.status(401).json({ message: 'User Not Updated' })
-    }
-
-    return res.status(200).json({
-        success: true
-    })
-}
+  };
+  
+  
 
 exports.updatePassword = async (req, res, next) => {
     console.log(req.body.password)

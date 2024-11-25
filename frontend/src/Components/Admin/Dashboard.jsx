@@ -1,118 +1,159 @@
-import React from 'react';
-import { Box, Grid, Card, CardContent, Typography, TextField } from '@mui/material';
-import { styled } from '@mui/system';
-import Sidebar from './Sidebar'; // Import the Sidebar component
+import React, { useState } from 'react';
+import Chart from 'chart.js/auto';
+import { Box, Grid, Card, CardContent, Typography, TextField, Button } from '@mui/material';
+import Sidebar from './Sidebar'; // Optional: Import your Sidebar component if needed
 
 const Dashboard = () => {
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [chartInstance, setChartInstance] = useState(null);
+  
+
+  const fetchSalesData = async () => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (startDate) queryParams.append('startDate', startDate);
+      if (endDate) queryParams.append('endDate', endDate);
+  
+      const response = await fetch(`http://localhost:5000/api/v1/orders/monthly-sales?${queryParams.toString()}`);
+      
+      if (!response.ok) {
+        const errorText = await response.text(); // Capture the raw error response
+        console.error('Error response:', errorText); // Log the error for debugging
+        throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
+      }
+  
+      const data = await response.json(); // Parse as JSON
+  
+      if (data.success) {
+        const labels = data.data.map((sale) => `${sale.month}-${sale.year}`);
+        const sales = data.data.map((sale) => sale.totalSales);
+        renderChart(labels, sales);
+      } else {
+        console.error(data.message);
+      }
+    } catch (error) {
+      console.error('Failed to fetch sales data:', error.message);
+    }
+  };
+  
+  
+
+  const renderChart = (labels, sales) => {
+    const ctx = document.getElementById('salesChart').getContext('2d');
+    if (chartInstance) {
+      chartInstance.destroy(); // Destroy existing chart instance to prevent overlaps
+    }
+    const newChartInstance = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'Monthly Sales (in PHP)', // Change the label to 'in PHP'
+            data: sales,
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderColor: 'rgba(75, 192, 192, 1)',
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            title: {
+              display: true,
+              text: 'Sales (in PHP)', // Change the label for the Y-axis to Peso
+            },
+            ticks: {
+              callback: function (value) {
+                // Format the y-axis ticks as Peso currency
+                return '₱' + value.toLocaleString();
+              },
+            },
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Month-Year',
+            },
+          },
+        },
+      },
+    });
+    setChartInstance(newChartInstance);
+  };
+  
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    fetchSalesData();
+  };
+
   return (
     <Box sx={{ display: 'flex' }}>
-      {/* Sidebar */}
-      <Sidebar />
+      {/* Sidebar Component - Optional */}
+      {Sidebar && <Sidebar />}
 
-      {/* Dashboard Content */}
-      <Box
-        sx={{
-          padding: 4,
-          backgroundColor: '#f7f8fc',
-          minHeight: '100vh',
-          marginLeft: '250px', // Adjust the content area to the right of the sidebar
-          flexGrow: 1,
-        }}
-      >
-        {/* Header */}
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
-          <Typography variant="h4" fontWeight="bold">
-            Dashboard
-          </Typography>
-          <TextField
-            variant="outlined"
-            placeholder="Search here..."
-            size="small"
-            sx={{
-              width: 300,
-              backgroundColor: '#fff',
-              borderRadius: 1,
-              boxShadow: '0 1px 3px rgba(0, 0, 0, 0.2)',
-            }}
-          />
-        </Box>
+      <Box sx={{ flexGrow: 1, padding: 3 }}>
+        <Typography variant="h4" gutterBottom>
+          Dashboard
+        </Typography>
 
-        {/* Summary Cards */}
-        <Grid container spacing={3} sx={{ marginBottom: 4 }}>
-          <Grid item xs={12} md={4}>
-            <StyledCard color="#ff6584">
-              <Typography variant="h5">$1k</Typography>
-              <Typography>Total Sales</Typography>
-            </StyledCard>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledCard color="#333c72">
-              <Typography variant="h5">300</Typography>
-              <Typography>Total Orders</Typography>
-            </StyledCard>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <StyledCard color="#6f42c1">
-              <Typography variant="h5">5</Typography>
-              <Typography>Products Sold</Typography>
-            </StyledCard>
-          </Grid>
-        </Grid>
+        {/* Filter Section */}
+        <Card sx={{ marginBottom: 3 }}>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Filter Sales Data
+            </Typography>
+            <Box
+              component="form"
+              onSubmit={handleSubmit}
+              sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}
+            >
+              <TextField
+                label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ flex: 1, minWidth: 200 }}
+              />
+              <TextField
+                label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                InputLabelProps={{ shrink: true }}
+                sx={{ flex: 1, minWidth: 200 }}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{ alignSelf: 'center' }}
+              >
+                Filter Sales
+              </Button>
+            </Box>
+          </CardContent>
+        </Card>
 
-        {/* Charts Section */}
-        <Grid container spacing={3} sx={{ marginBottom: 4 }}>
-          <Grid item xs={12} md={4}>
-            <ChartCard title="Total Revenue" />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <ChartCard title="Customer Satisfaction" />
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <ChartCard title="Visitor Insights" />
-          </Grid>
-        </Grid>
+        {/* Chart Section */}
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Monthly Sales Chart
+            </Typography>
+            <Box sx={{ position: 'relative', height: 400, width: '100%' }}>
+              <canvas id="salesChart"></canvas>
+            </Box>
+          </CardContent>
+        </Card>
       </Box>
     </Box>
   );
 };
-
-// Styled Components for Custom Card Designs
-const StyledCard = styled(Card)(({ color }) => ({
-  backgroundColor: color,
-  color: '#fff',
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  height: 120,
-  borderRadius: 8,
-  boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-  textAlign: 'center',
-}));
-
-const ChartCard = ({ title }) => (
-  <Card sx={{ height: 250, padding: 2, borderRadius: 2, boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-    <CardContent>
-      <Typography variant="h6" fontWeight="bold" textAlign="center">
-        {title}
-      </Typography>
-      {/* Placeholder for Chart */}
-      <Box
-        sx={{
-          height: 180,
-          backgroundColor: '#f0f0f5',
-          borderRadius: 2,
-          marginTop: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          color: '#aaa',
-        }}
-      >
-        Chart Placeholder
-      </Box>
-    </CardContent>
-  </Card>
-);
 
 export default Dashboard;

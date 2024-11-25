@@ -123,3 +123,84 @@ exports.getOrdersByStatus = async (req, res) => {
       res.status(500).json({ success: false, message: 'Error fetching orders' });
     }
   };
+
+// Controller: Fetch orders for the logged-in user
+exports.getUserOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({ userId: req.user._id })
+      .populate('items.bookId', 'title price imagePath')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({ success: true, orders });
+  } catch (err) {
+    res.status(500).json({ success: false, message: 'Failed to fetch orders' });
+  }
+};
+
+exports.getMonthlySales = async (req, res) => {
+  const { startDate, endDate } = req.query;
+
+  try {
+    // Parse the startDate and endDate from the query parameters.
+    const start = new Date(startDate); // Using the Date constructor for better date handling.
+    const end = new Date(endDate);
+
+    // Ensure the dates are valid
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      return res.status(400).json({ success: false, message: 'Invalid date format' });
+    }
+
+    // Ensure end date is inclusive of the whole day (set time to 23:59:59)
+    end.setHours(23, 59, 59, 999);
+
+    // Aggregate order data for monthly sales
+    const salesData = await Order.aggregate([
+      {
+        $unwind: '$items',
+      },
+      {
+        $match: {
+          'items.bookId': { $ne: null }, // Ensure that bookId exists
+          createdAt: { $gte: start, $lte: end }, // Match the date range
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: '$createdAt' },
+            year: { $year: '$createdAt' },
+            bookId: '$items.bookId',
+          },
+          totalSales: { $sum: '$items.subtotal' }, // Calculate the total sales for each book
+        },
+      },
+      {
+        $lookup: {
+          from: 'books', // Reference the books collection
+          localField: '_id.bookId',
+          foreignField: '_id',
+          as: 'bookDetails',
+        },
+      },
+      {
+        $unwind: '$bookDetails',
+      },
+      {
+        $project: {
+          month: '$_id.month', // Correct field path
+          year: '$_id.year', // Correct field path
+          title: '$bookDetails.title',
+          totalSales: 1,
+        },
+      },
+      {
+        $sort: { year: 1, month: 1 },
+      },
+    ]);
+
+    res.status(200).json({ success: true, data: salesData });
+  } catch (err) {
+    console.error('Error fetching monthly sales:', err.message);
+    res.status(500).json({ success: false, message: 'Error fetching monthly sales' });
+  }
+};

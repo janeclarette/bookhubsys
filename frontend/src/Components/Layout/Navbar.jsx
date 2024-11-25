@@ -24,9 +24,11 @@ import {
   Logout as LogoutIcon,
   PersonAdd as PersonAddIcon,
   Info as InfoIcon,
-  AccountCircle as AccountCircleIcon,  // Import Profile Icon
-  ExitToApp as ExitToAppIcon,          // Import Logout Icon
+  AccountCircle as AccountCircleIcon,
+  ExitToApp as ExitToAppIcon,
 } from "@mui/icons-material";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Import the GIF
 import bookHubIcon from "/src/assets/img/BookhubIcon.gif";
@@ -51,9 +53,23 @@ const Navbar = () => {
 
   const handleCartClick = () => {
     if (!user) {
-      alert("You must log in first!");
+      toast.error("You must log in first!", {
+        position: "top-center",
+        autoClose: 3000,
+      });
     } else {
       navigate("/cart");
+    }
+  };
+
+  const handleOrderClick = () => {
+    if (!user) {
+      toast.error("You must log in first!", {
+        position: "top-center",
+        autoClose: 3000,
+      });
+    } else {
+      navigate("/order");
     }
   };
 
@@ -64,7 +80,7 @@ const Navbar = () => {
   const drawerContent = (
     <Box sx={{ width: 250 }}>
       <List>
-        <ListItem button component={Link} to={user ? "/dashboard" : "/"} >
+        <ListItem button component={Link} to={user ? "/dashboard" : "/"}>
           <ListItemIcon>
             <HomeIcon />
           </ListItemIcon>
@@ -163,9 +179,9 @@ const Navbar = () => {
           {/* BookHub Icon and title */}
           <Box sx={{ display: "flex", alignItems: "center" }}>
             <img
-              src={bookHubIcon} // Use the imported GIF
+              src={bookHubIcon}
               alt="BookHub Icon"
-              style={{ width: 50, height: 70, marginRight: 8 }} // Size and margin for the icon
+              style={{ width: 50, height: 70, marginRight: 8 }}
             />
             <Typography
               variant="h5"
@@ -182,94 +198,35 @@ const Navbar = () => {
           {/* Navigation links */}
           <Box
             sx={{
-              display: { xs: "none", md: "flex" }, // Hide on small screens
-              justifyContent: "center", // Center-aligns the navigation links
+              display: { xs: "none", md: "flex" },
+              justifyContent: "center",
               alignItems: "center",
               flexGrow: 1,
-              gap: 4, // Space between navigation buttons
+              gap: 4,
             }}
           >
-            <Button
-              color="inherit"
-              component={Link}
-              to={user ? "/dashboard" : "/"}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#693668", // Highlight color on hover
-                  transition: "background-color 0.3s ease",
-                },
-              }}
-            >
+            <Button color="inherit" component={Link} to={user ? "/dashboard" : "/"}>
               Home
             </Button>
-            <Button
-              color="inherit"
-              component={Link}
-              to="/genres"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#693668", // Highlight color on hover
-                  transition: "background-color 0.3s ease",
-                },
-              }}
-            >
+            <Button color="inherit" component={Link} to="/genres">
               Genres
             </Button>
-            <Button
-              color="inherit"
-              component={Link}
-              to="/authors"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#693668", // Highlight color on hover
-                  transition: "background-color 0.3s ease",
-                },
-              }}
-            >
+            <Button color="inherit" component={Link} to="/authors">
               Authors
             </Button>
-            <Button
-              color="inherit"
-              component={Link}
-              to="/about"
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#693668", // Highlight color on hover
-                  transition: "background-color 0.3s ease",
-                },
-              }}
-            >
-              About Us
+            <Button color="inherit" onClick={handleOrderClick}>
+              Orders
             </Button>
           </Box>
 
-          {/* Right-side buttons like Profile/Logout */}
+          {/* Right-side buttons */}
           <Box sx={{ display: "flex", gap: 1 }}>
-            <IconButton
-              color="inherit"
-              onClick={handleCartClick}
-              sx={{
-                "&:hover": {
-                  backgroundColor: "#693668", // Highlight color on hover
-                  transition: "background-color 0.3s ease",
-                },
-              }}
-            >
+            <IconButton color="inherit" onClick={handleCartClick}>
               <ShoppingCartIcon />
             </IconButton>
             {user ? (
               <>
-                <IconButton
-                  color="inherit"
-                  component={Link}
-                  to="/profile"
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#693668", // Highlight color on hover
-                      transition: "background-color 0.3s ease",
-                    },
-                  }}
-                >
+                <IconButton color="inherit" component={Link} to="/profile">
                   <AccountCircleIcon />
                 </IconButton>
                 <Button color="inherit" onClick={handleLogout}>
@@ -279,31 +236,11 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <Button
-                  color="inherit"
-                  component={Link}
-                  to="/login"
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#693668", // Highlight color on hover
-                      transition: "background-color 0.3s ease",
-                    },
-                  }}
-                >
+                <Button color="inherit" component={Link} to="/login">
                   <LoginIcon sx={{ marginRight: 1 }} />
                   Login
                 </Button>
-                <Button
-                  color="inherit"
-                  component={Link}
-                  to="/register"
-                  sx={{
-                    "&:hover": {
-                      backgroundColor: "#693668", // Highlight color on hover
-                      transition: "background-color 0.3s ease",
-                    },
-                  }}
-                >
+                <Button color="inherit" component={Link} to="/register">
                   <PersonAddIcon sx={{ marginRight: 1 }} />
                   Register
                 </Button>
@@ -315,6 +252,7 @@ const Navbar = () => {
       <Drawer anchor="left" open={isDrawerOpen} onClose={toggleDrawer(false)}>
         {drawerContent}
       </Drawer>
+      <ToastContainer />
     </>
   );
 };

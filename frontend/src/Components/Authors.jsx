@@ -33,7 +33,7 @@ const Authors = () => {
   };
 
   const viewAuthorWorks = (authorId) => {
-    navigate(`/authorworks/${authorId}`); // Navigate to the AuthorsWorks page
+    navigate(`/authorworks/${authorId}`); 
   };
 
   const alphabet = Array.from(Array(26), (_, i) => String.fromCharCode(65 + i));

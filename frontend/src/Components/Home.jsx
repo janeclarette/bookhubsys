@@ -7,12 +7,14 @@ import Footer from './Layout/Footer';
 import { CssBaseline, GlobalStyles, Box, Typography, Button, TextField, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
   const [showPopup, setShowPopup] = useState(false); 
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchBooks();
@@ -59,7 +61,7 @@ const Home = () => {
 
   // View Details Function
   const viewDetails = (bookId) => {
-    console.log(`Viewing details for book with ID ${bookId}`);
+    navigate(`/viewdetails/${bookId}`); // Navigate to ViewDetails page with bookId as a parameter
   };
 
   // Close Popup

@@ -5,6 +5,8 @@ import { Box, Container, Typography, TextField, Button, Alert, CssBaseline, Glob
 import { Twitter, Facebook, Google } from "@mui/icons-material"; // Import icons
 import { useFormik } from "formik"; // Import Formik
 import * as Yup from "yup"; // Import Yup for validation
+import { toast, ToastContainer } from "react-toastify"; // Import Toastify
+import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
 import b1Gif from "/src/assets/img/b2.gif"; // Import the GIF
 
 const Login = () => {
@@ -38,19 +40,30 @@ const Login = () => {
         if (err.response) {
           // Check if the error indicates account deactivation
           if (err.response.status === 403) {
+            toast.error("Your account has been deactivated. Please contact support.", {
+              position: "bottom-right",
+            });
             setError("Your account has been deactivated. Please contact support.");
           } else {
+            toast.error(err.response.data.message || "Something went wrong", {
+              position: "bottom-right",
+            });
             setError(err.response.data.message || "Something went wrong");
           }
         } else if (err.request) {
+          toast.error("No response from server. Check your backend configuration.", {
+            position: "bottom-right",
+          });
           setError("No response from server. Check your backend configuration.");
         } else {
+          toast.error("Error occurred during the request: " + err.message, {
+            position: "bottom-right",
+          });
           setError("Error occurred during the request: " + err.message);
         }
       }
     },
   });
-  
 
   return (
     <>
@@ -73,6 +86,9 @@ const Login = () => {
           "#root": { height: "100%" },
         }}
       />
+
+      {/* Toast container for notifications */}
+      <ToastContainer />
 
       <Container
         maxWidth={false}

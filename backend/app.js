@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const cookieParser = require('cookie-parser');
 const cors = require('cors');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' }); 
 
 const authorRoutes = require('./routes/author');
 const genreRoutes = require('./routes/genre');
@@ -11,6 +13,7 @@ const auth = require('./routes/auth');
 const cartRoutes = require('./routes/cart');
 const checkoutRoutes = require('./routes/checkout');
 const orderRoutes = require('./routes/orderRoutes');
+const reviewRoutes = require('./routes/review'); 
 
 
 app.use(express.json({ limit: '50mb' }));
@@ -36,6 +39,9 @@ app.use('/api/v1', auth);
 app.use('/api/v1/cart', cartRoutes);
 app.use('/api/v1/checkout', checkoutRoutes);
 app.use('/api/v1/orders', orderRoutes);
+app.use('/api/v1/reviews', reviewRoutes); 
+
+
 
 app.use((err, req, res, next) => {
     console.error(err.stack);

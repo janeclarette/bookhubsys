@@ -37,8 +37,10 @@ import UserDashboard from './Components/User/UserDashboard';
 import Profile from './Components/User/Profile';
 import Cart from './Components/User/Cart';
 import Checkout from './Components/User/Checkout';
+import Order from './Components/User/Order';
 
 import './App.css';
+
 
 
 
@@ -82,7 +84,7 @@ const App = () => {
                 <Route path="/profile" element={<Profile />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
-
+                <Route path="/order" element={<Order />} />
 
             </Routes>
             </div>

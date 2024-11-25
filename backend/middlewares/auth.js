@@ -36,3 +36,25 @@ exports.authorizeRoles = (...roles) => {
         next()
     }
 }
+
+
+exports.protect = async (req, res, next) => {
+  let token;
+
+  // Extract token from cookies
+  if (req.cookies.token) {
+    token = req.cookies.token; // Adjust based on cookie key
+  }
+
+  if (!token) {
+    return res.status(401).json({ message: 'User not authenticated.' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decoded.id).select('-password');
+    next();
+  } catch (error) {
+    res.status(401).json({ message: 'Invalid token. Please log in again.' });
+  }
+};
