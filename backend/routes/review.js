@@ -1,5 +1,5 @@
 const express = require('express');
-const { addReview } = require('../controllers/review'); // Import the controller function
+const { addReview , getReviewById, updateReview, deleteReview } = require('../controllers/review'); // Import the controller function
 const { isAuthenticatedUser } = require('../middlewares/auth'); // Middleware for authentication
 const Review = require('../models/review');  
 
@@ -16,5 +16,12 @@ router.get('/', async (req, res) => {
       res.status(500).json({ message: 'Error fetching reviews' });
     }
   });
+
+
+router.get('/:id', isAuthenticatedUser, getReviewById); // Use the review ID as a parameter
+router.put('/:id', isAuthenticatedUser, updateReview); // Update review by orderId
+
+router.delete('/:id', deleteReview);
+
 
 module.exports = router;

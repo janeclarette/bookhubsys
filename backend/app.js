@@ -19,12 +19,12 @@ const reviewRoutes = require('./routes/review');
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 
-// CORS configuration to allow credentials and specific origin
+
 const corsOptions = {
-    origin: 'http://localhost:5173', // Frontend URL
-    credentials: true,               // Allow cookies or credentials
+    origin: 'http://localhost:5173', 
+    credentials: true,               
 };
-app.use(cors(corsOptions)); // Use this CORS configuration
+app.use(cors(corsOptions)); 
 
 app.use(cookieParser());
 

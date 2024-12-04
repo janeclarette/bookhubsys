@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Box, Typography, TextField, IconButton, CssBaseline, GlobalStyles } from '@mui/material';
+import { Box, Typography, TextField, IconButton, CssBaseline, GlobalStyles, RadioGroup, FormControlLabel, Radio } from '@mui/material';
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
 import Header from '../Layout/Header';
-import { width } from '@mui/system';
 
 const UserDashboard = () => {
   const [user, setUser] = useState(null);
   const [books, setBooks] = useState([]);
   const [filteredBooks, setFilteredBooks] = useState([]);
   const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+  const [selectedRating, setSelectedRating] = useState(''); 
   const [cart, setCart] = useState([]);
   const [error, setError] = useState('');
 
@@ -29,11 +29,23 @@ const UserDashboard = () => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/books');
-        const books = response.data.books.map((book) => ({
-          ...book,
-          authorName: book.authorId ? book.authorId.name : 'Unknown Author',
-          imageUrl: book.images && book.images.length > 0 ? book.images[0].url : 'https://via.placeholder.com/150',
-        }));
+        const reviewsResponse = await axios.get('http://localhost:5000/api/v1/reviews');
+        const reviews = reviewsResponse.data.reviews;
+
+        const books = response.data.books.map((book) => {
+          const bookReviews = reviews.filter(review => review.bookId === book._id);
+          const averageRating = bookReviews.length
+            ? bookReviews.reduce((sum, review) => sum + review.rating, 0) / bookReviews.length
+            : 0;
+
+          return {
+            ...book,
+            authorName: book.authorId ? book.authorId.name : 'Unknown Author',
+            imageUrl: book.images && book.images.length > 0 ? book.images[0].url : 'https://via.placeholder.com/150',
+            averageRating: averageRating.toFixed(1),
+          };
+        });
+
         setBooks(books);
         setFilteredBooks(books);
       } catch (error) {
@@ -47,14 +59,22 @@ const UserDashboard = () => {
 
   useEffect(() => {
     const filtered = books.filter(
-      (book) => book.price >= priceRange.min && book.price <= priceRange.max
+      (book) => 
+        book.price >= priceRange.min && 
+        book.price <= priceRange.max &&
+        (selectedRating === '' || Math.round(book.averageRating) === parseInt(selectedRating))
     );
     setFilteredBooks(filtered);
-  }, [priceRange, books]);
+  }, [priceRange, selectedRating, books]);
+  
 
   const handlePriceChange = (e) => {
     const { name, value } = e.target;
     setPriceRange((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleRatingChange = (e) => {
+    setSelectedRating(e.target.value); 
   };
 
   const handleAddToCart = async (book) => {
@@ -73,13 +93,22 @@ const UserDashboard = () => {
     console.log(`Viewing details for book with ID ${bookId}`);
   };
 
+  const renderStars = (rating) => {
+    const stars = [];
+    for (let i = 1; i <= 5; i++) {
+      stars.push(
+        <span key={i} style={{ color: i <= rating ? '#FFD700' : '#ddd' }}>★</span>
+      );
+    }
+    return stars;
+  };
+
   return (
     <Box sx={styles.container}>
       <CssBaseline />
       <GlobalStyles styles={globalStyles} />
       <Navbar />
 
-      {/* User Info */}
       {user && (
         <Box sx={styles.userInfo}>
           <Box sx={styles.avatarContainer}>
@@ -100,10 +129,11 @@ const UserDashboard = () => {
         </Box>
       )}
 
-      {/* Header Component */}
+
       <Header />
       <Typography variant="h4" sx={styles.headerText}>Home - Book Collection</Typography>
-      {/* Price Filter */}
+
+
       <Box sx={styles.filterContainer}>
         <TextField
           label="Min Price"
@@ -123,7 +153,16 @@ const UserDashboard = () => {
         />
       </Box>
 
-      {/* Book Grid */}
+      <Box sx={styles.filterContainer}>
+        <Typography variant="body1">Filter by Rating:</Typography>
+        <RadioGroup row value={selectedRating} onChange={handleRatingChange}>
+          {[1, 2, 3, 4, 5].map(rating => (
+            <FormControlLabel key={rating} value={rating.toString()} control={<Radio />} label={`${rating} Star`} />
+          ))}
+          <FormControlLabel value="" control={<Radio />} label="All Ratings" />
+        </RadioGroup>
+      </Box>
+
       <Box sx={styles.bookGrid}>
         {filteredBooks.map((book) => (
           <Box key={book._id} sx={styles.bookCard}>
@@ -131,6 +170,9 @@ const UserDashboard = () => {
             <Typography variant="h6">{book.title}</Typography>
             <Typography variant="body2">Author: {book.authorName}</Typography>
             <Typography variant="body2">Price: ${book.price}</Typography>
+            <Box sx={styles.ratingContainer}>
+              {renderStars(book.averageRating)}
+            </Box>
             <Box sx={styles.buttonContainer}>
               <IconButton onClick={() => handleAddToCart(book)} sx={styles.iconButton}>
                 <AddShoppingCartIcon sx={styles.icon} />
@@ -148,7 +190,7 @@ const UserDashboard = () => {
   );
 };
 
-// Styles
+
 const globalStyles = {
   body: {
     margin: 0,
@@ -211,63 +253,61 @@ const styles = {
     color: '#333',
   },
   userEmail: {
+    fontSize: '0.875rem',
     color: '#777',
-    fontSize: '1rem',
+  },
+  headerText: {
+    textAlign: 'center',
+    marginTop: '20px',
   },
   filterContainer: {
     display: 'flex',
+    alignItems: 'center',
     justifyContent: 'center',
+    margin: '10px 0',
     gap: '10px',
-    marginBottom: '20px',
   },
   textField: {
-    width: '200px',
-    '& .MuiInputBase-root': {
-      height: '40px',
-    },
-    '& .MuiInputBase-input': {
-      padding: '0 12px',
-    },
-    marginTop: '30px',
+    width: '150px',
   },
   bookGrid: {
-    display: 'flex',
-    flexWrap: 'wrap',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
     gap: '20px',
-    justifyContent: 'center',
     padding: '20px',
   },
   bookCard: {
-    width: 200,
-    padding: 2,
-    border: '1px solid #ddd',
-    borderRadius: 2,
-    textAlign: 'center',
-    boxShadow: 2,
     backgroundColor: '#fff',
+    border: '1px solid #ddd',
+    borderRadius: '8px',
+    padding: '10px',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    transition: 'transform 0.2s',
+    '&:hover': {
+      transform: 'scale(1.05)',
+    },
   },
   bookImage: {
     width: '100%',
     height: 'auto',
-    borderRadius: 2,
+    borderRadius: '4px',
+    marginBottom: '10px',
+  },
+  ratingContainer: {
+    margin: '10px 0',
   },
   buttonContainer: {
     display: 'flex',
-    justifyContent: 'center',
-    gap: '10px',
-    marginTop: '10px',
+    justifyContent: 'space-between',
+    width: '100%',
   },
   iconButton: {
-    backgroundColor: '#f5a623',
-    borderRadius: '50%',
-    padding: '10px',
-    '&:hover': {
-      backgroundColor: '#f39c12',
-    },
+    color: '#f5a623',
   },
   icon: {
-    fontSize: '24px',
-    color: '#fff',
+    fontSize: '1.5rem',
   },
 };
 

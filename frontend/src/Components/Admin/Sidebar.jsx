@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt, FaUsers } from 'react-icons/fa';
+import { FaTachometerAlt, FaUser, FaBook, FaLayerGroup, FaBox, FaSignOutAlt, FaUsers, FaStar } from 'react-icons/fa'; // Added FaStar
 import axios from 'axios';
 import bookhubLogo from '../../assets/img/bookhublogo.png';
 import bookhubIcon from '../../assets/img/bookhubIcon.gif';
@@ -14,10 +14,10 @@ const Sidebar = ({ onHoverChange }) => {
   const navItemStyle = (path) => ({
     display: 'flex',
     alignItems: 'center',
-    fontSize: '18px',
-    marginBottom: '20px',
-    padding: '10px 15px',
-    borderRadius: '25px',
+    fontSize: '16px', // Adjusted font size
+    marginBottom: '15px', // Adjusted margin
+    padding: '8px 12px', // Adjusted padding
+    borderRadius: '20px', // Reduced border radius
     textDecoration: 'none',
     backgroundColor: location.pathname === path ? '#9e1c63' : 'transparent',
     color: location.pathname === path ? '#ffffff' : '#262222',
@@ -27,8 +27,8 @@ const Sidebar = ({ onHoverChange }) => {
   });
 
   const iconStyle = {
-    fontSize: '24px',
-    marginRight: '10px',
+    fontSize: '20px', // Adjusted icon size
+    marginRight: '8px', // Adjusted margin
   };
 
   const handleMouseEnter = () => {
@@ -42,26 +42,25 @@ const Sidebar = ({ onHoverChange }) => {
   };
 
   const handleLogout = () => {
-    
-    setAdminName("");  
-    navigate('/login/admin'); 
-    window.location.reload();  
+    setAdminName("");
+    navigate('/login/admin');
+    window.location.reload();
   };
 
   useEffect(() => {
     const fetchAdminName = async () => {
       try {
-        const token = localStorage.getItem('adminToken');  
+        const token = localStorage.getItem('adminToken');
         if (!token) {
           console.error("Token not found in localStorage.");
           navigate('/login/admin');
           return;
         }
-    
+
         const response = await axios.get("http://localhost:5000/api/v1/admin/profile", {
           headers: { Authorization: `Bearer ${token}` },
         });
-    
+
         setAdminName(response.data.name);
       } catch (error) {
         console.error("Failed to fetch admin details:", error.response ? error.response.data : error);
@@ -70,10 +69,9 @@ const Sidebar = ({ onHoverChange }) => {
         }
       }
     };
-    
 
     fetchAdminName();
-  }, []);  
+  }, []);
 
   return (
     <div
@@ -93,7 +91,7 @@ const Sidebar = ({ onHoverChange }) => {
         boxShadow: '2px 0 5px rgba(0, 0, 0, 0.5)',
         zIndex: 1000,
         transition: 'width 0.3s ease',
-        overflowY: 'auto', 
+        overflowY: 'auto',
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -122,8 +120,9 @@ const Sidebar = ({ onHoverChange }) => {
               { to: '/admin/books', icon: <FaBook style={iconStyle} />, label: 'Book Management' },
               { to: '/admin/users', icon: <FaUsers style={iconStyle} />, label: 'User Management' },
               { to: '/admin/orders', icon: <FaBox style={iconStyle} />, label: 'Order Management' },
+              { to: '/admin/reviews', icon: <FaStar style={iconStyle} />, label: 'Review Management' }, 
             ].map(({ to, icon, label }, index) => (
-              <li key={index} style={{ marginBottom: '20px' }}>
+              <li key={index} style={{ marginBottom: '15px' }}>
                 <Link to={to} style={navItemStyle(to)}>
                   <span style={{ display: 'flex', alignItems: 'center' }}>
                     {icon}

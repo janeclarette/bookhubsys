@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { Box, Button, Typography, TableContainer, Paper } from '@mui/material';
+import MUIDataTable from 'mui-datatables';
+import Sidebar from './Sidebar';
 import axios from 'axios';
-import Sidebar from './Sidebar';  
 
 const OrderList = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('');
+  const [isSidebarHovered, setSidebarHovered] = useState(false); // Sidebar hover state
 
-  
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/v1/orders/admin/orders', {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, 
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
         setOrders(response.data.orders);
@@ -28,7 +30,7 @@ const OrderList = () => {
 
   const handleStatusChange = async (orderId) => {
     try {
-      const response = await axios.put(
+      await axios.put(
         'http://localhost:5000/api/v1/orders/admin/orders/update-status',
         { orderId, status },
         {
@@ -38,7 +40,6 @@ const OrderList = () => {
         }
       );
       alert('Order status updated');
-      // Re-fetch orders
       setOrders((prevOrders) =>
         prevOrders.map((order) =>
           order._id === orderId ? { ...order, orderStatus: status } : order
@@ -49,59 +50,115 @@ const OrderList = () => {
     }
   };
 
+  const columns = [
+    {
+      name: '_id',
+      label: 'Order ID',
+    },
+    {
+      name: 'userId',
+      label: 'User',
+      options: {
+        customBodyRender: (value) => (value?.name || 'Unknown User'),
+      },
+    },
+    {
+      name: 'items',
+      label: 'Books Ordered',
+      options: {
+        customBodyRender: (items) =>
+          items.map((item) => (
+            <Box key={item._id} marginBottom={1}>
+              <Typography>{item?.bookId?.title || 'Unknown Book'} (x{item.quantity})</Typography>
+              <Typography>Price: {item.price}</Typography>
+              <Typography>Subtotal: {item.subtotal}</Typography>
+            </Box>
+          )) || 'No items',
+      },
+    },
+    {
+      name: 'orderStatus',
+      label: 'Status',
+      options: {
+        customBodyRender: (value, tableMeta) => (
+          <select
+            value={status || value}
+            onChange={(e) => setStatus(e.target.value)}
+            style={{
+              padding: '5px',
+              borderRadius: '4px',
+              border: '1px solid #ccc',
+            }}
+          >
+            <option value="Pending">Pending</option>
+            <option value="Shipped">Shipped</option>
+            <option value="Delivered">Delivered</option>
+            <option value="Cancelled">Cancelled</option>
+          </select>
+        ),
+      },
+    },
+    {
+      name: '_id',
+      label: 'Action',
+      options: {
+        customBodyRender: (value) => (
+          <Button
+            variant="contained"
+            sx={{
+              backgroundColor: '#e91e63',
+              color: 'white',
+              textTransform: 'none',
+              '&:hover': { backgroundColor: '#d81b60' },
+            }}
+            onClick={() => handleStatusChange(value)}
+          >
+            Update Status
+          </Button>
+        ),
+      },
+    },
+  ];
+
+  const options = {
+    selectableRows: 'none',
+    responsive: 'standard',
+  };
+
   return (
-    <div style={{ display: 'flex' }}>
-      <Sidebar onHoverChange={() => {}} />  {/* Sidebar component */}
-      <div style={{ marginLeft: '250px', padding: '20px', flex: 1 }}>
-        <h1>Order Management</h1>
+    <Box display="flex" minHeight="100vh">
+      {/* Sidebar component with hover effect */}
+      <Sidebar onHoverChange={setSidebarHovered} />
+
+      {/* Main content */}
+      <Box
+        style={{
+          marginLeft: isSidebarHovered ? '250px' : '60px',
+          transition: 'margin-left 0.3s ease',
+          padding: '20px',
+          width: '100%',
+        }}
+      >
+        {/* Header */}
+        <Box marginBottom={2}>
+          <Typography variant="h4" sx={{ fontFamily: 'Fjalla One, sans-serif', fontWeight: 'bold' }}>
+            Order Management
+          </Typography>
+          <Typography variant="body2" sx={{ color: 'gray', marginTop: 2 }}>
+            View and manage all customer orders.
+          </Typography>
+        </Box>
+
+        {/* DataTable */}
         {loading ? (
-          <p>Loading orders...</p>
+          <Typography>Loading orders...</Typography>
         ) : (
-          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-            <thead>
-              <tr>
-                <th>Order ID</th>
-                <th>User</th>
-                <th>Books Ordered</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orders.map((order) => (
-                <tr key={order._id}>
-                  <td>{order._id}</td>
-                  <td>{order.userId.name}</td>
-                  <td>
-                    {order.items.map((item) => (
-                      <div key={item._id}>
-                        <p>{item.bookId.title} (x{item.quantity})</p>
-                        <p>Price: {item.price}</p>
-                        <p>Subtotal: {item.subtotal}</p>
-                      </div>
-                    ))}
-                  </td>
-                  <td>
-                    <select
-                      value={status || order.orderStatus}
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="Shipped">Shipped</option>
-                      <option value="Delivered">Delivered</option>
-                      <option value="Cancelled">Cancelled</option>
-                    </select>
-                  </td>
-                  <td>
-                    <button onClick={() => handleStatusChange(order._id)}>Update Status</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <TableContainer component={Paper}>
+            <MUIDataTable title="Orders" data={orders} columns={columns} options={options} />
+          </TableContainer>
         )}
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 

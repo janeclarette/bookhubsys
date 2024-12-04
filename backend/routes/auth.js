@@ -18,7 +18,6 @@ const { registerUser,
 } = require('../controllers/auth');
     const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
-
 const { getAllUsers, toggleUserActiveStatus } = require('../controllers/auth.js');
 
 router.post('/register', upload.single('avatar'), registerUser);
@@ -39,5 +38,7 @@ router.route('/admin/user/:id').get(isAuthenticatedUser,  getUserDetails).put(is
 
 router.get('/admin/users', getAllUsers);
 router.patch('/admin/users/:userId/activate', toggleUserActiveStatus);
+
+
 
 module.exports = router;

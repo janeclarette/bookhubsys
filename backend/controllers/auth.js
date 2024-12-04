@@ -5,6 +5,8 @@ const crypto = require('crypto')
 const cloudinary = require('cloudinary')
 const upload = require("../utils/multer");
 
+
+
 exports.registerUser = async (req, res, next) => {
     try {
         // Ensure the file was uploaded

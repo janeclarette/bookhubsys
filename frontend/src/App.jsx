@@ -15,6 +15,7 @@ import NewBook from './Components/Admin/NewBook';
 import UpdateBook from './Components/Admin/UpdateBook'; 
 import UserList from './Components/Admin/UserList';
 import OrderList from './Components/Admin/OrderList';
+import Review from './Components/Admin/Review';
 // import { AuthProvider } from './context/AuthContext';
 // import Login from './Components/User/Login';
 // import Register from './Components/User/Register';
@@ -38,6 +39,7 @@ import Profile from './Components/User/Profile';
 import Cart from './Components/User/Cart';
 import Checkout from './Components/User/Checkout';
 import Order from './Components/User/Order';
+import Rating from './Components/User/Rating';
 
 import './App.css';
 
@@ -69,6 +71,7 @@ const App = () => {
                 <Route path="/admin/books/update/:id" element={<UpdateBook />} /> 
                 <Route path="/admin/users" element={<UserList />} /> 
                 <Route path="/admin/orders" element={<OrderList />} /> 
+                <Route path="/admin/reviews" element={<Review />} /> 
 
                 <Route path="/admin" element={<Dashboard />}/>
                 <Route path="/genres" element={<Genre />} />
@@ -85,6 +88,7 @@ const App = () => {
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/order" element={<Order />} />
+                <Route path="/rating" element={<Rating />} />
 
             </Routes>
             </div>

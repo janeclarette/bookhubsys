@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import axios from 'axios';
 import { 
   Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, 
@@ -8,19 +9,23 @@ import Navbar from '../Layout/Navbar';
 import Footer from '../Layout/Footer';
 import Header from '../Layout/Header';
 
-
 const Order = () => {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState('');
   const [open, setOpen] = useState(false);
   const [review, setReview] = useState({ rating: 0, comment: '', orderId: '' });
+  const [submittedReviews, setSubmittedReviews] = useState({}); // Track submissions by order ID
+  const navigate = useNavigate(); 
 
-  // Fetch orders
   useEffect(() => {
     const fetchUserOrders = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/v1/orders', { withCredentials: true });
         setOrders(response.data.orders);
+
+        // Check local storage for previously submitted reviews
+        const storedReviews = JSON.parse(localStorage.getItem('submittedReviews')) || {};
+        setSubmittedReviews(storedReviews);
       } catch (err) {
         setError(err.response?.data?.message || 'Failed to fetch orders');
       }
@@ -31,20 +36,22 @@ const Order = () => {
 
   const handleReviewSubmit = async () => {
     try {
-      console.log('Submitting Review:', review);
       const response = await axios.post('http://localhost:5000/api/v1/reviews', review, { withCredentials: true });
       if (response.status === 201) {
         alert('Review submitted successfully');
         setReview({ rating: 0, comment: '', orderId: '' });
+        
+        // Mark this order as reviewed and save to local storage
+        const newSubmittedReviews = { ...submittedReviews, [review.orderId]: true };
+        setSubmittedReviews(newSubmittedReviews);
+        localStorage.setItem('submittedReviews', JSON.stringify(newSubmittedReviews));
+
         setOpen(false);
       }
     } catch (err) {
-      console.error('Review Submission Error:', err);
       alert(err.response?.data?.message || 'Failed to submit review');
     }
   };
-  
-  
 
   return (
     <Box sx={styles.container}>
@@ -53,7 +60,6 @@ const Order = () => {
       <Navbar />
       <Header />
 
-      {/* Orders Section */}
       <Box sx={styles.ordersContainer}>
         <Typography variant="h4" sx={styles.title}>
           Your Orders
@@ -94,16 +100,31 @@ const Order = () => {
                     <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
                     <TableCell>
                       {order.orderStatus === 'Delivered' && (
-                        <Button
-                          variant="contained"
-                          color="primary"
-                          onClick={() => {
-                            setReview({ ...review, orderId: order._id });
-                            setOpen(true);
-                          }}
-                        >
-                          Rate & Comment
-                        </Button>
+                        <>
+                          <Button
+                            variant="contained"
+                            sx={styles.rateButton}
+                            onClick={() => {
+                              setReview({ ...review, orderId: order._id });
+                              setOpen(true);
+                            }}
+                            disabled={submittedReviews[order._id]} // Disable if reviewed
+                          >
+                            Rate & Comment
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            sx={styles.viewRatingButton}
+                            onClick={() => navigate(`/rating?orderId=${order._id}`)}
+                          >
+                            View Rating
+                          </Button>
+                        </>
+                      )}
+                      {submittedReviews[order._id] && (
+                        <Typography variant="body2" sx={styles.submittedText}>
+                          Review Submitted
+                        </Typography>
                       )}
                     </TableCell>
                   </TableRow>
@@ -119,14 +140,17 @@ const Order = () => {
       {/* Review Modal */}
       <Modal open={open} onClose={() => setOpen(false)}>
         <Box sx={styles.modal}>
-          <Typography variant="h6" gutterBottom>
+          <Typography variant="h6" sx={styles.modalTitle}>
             Leave a Review
           </Typography>
-          <Rating
-            name="rating"
-            value={review.rating}
-            onChange={(e, newValue) => setReview({ ...review, rating: newValue })}
-          />
+          <Box sx={styles.rating}>
+            <Rating
+              name="rating"
+              value={review.rating}
+              onChange={(e, newValue) => setReview({ ...review, rating: newValue })}
+              size="large"
+            />
+          </Box>
           <TextField
             label="Comment"
             fullWidth
@@ -136,8 +160,12 @@ const Order = () => {
             value={review.comment}
             onChange={(e) => setReview({ ...review, comment: e.target.value })}
           />
-          <Button variant="contained" color="primary" onClick={handleReviewSubmit}>
-            Submit
+          <Button
+            variant="contained"
+            sx={styles.submitButton}
+            onClick={handleReviewSubmit}
+          >
+            Submit Review
           </Button>
         </Box>
       </Modal>
@@ -180,19 +208,67 @@ const styles = {
     color: 'red',
     marginBottom: '10px',
   },
+  rateButton: {
+    marginRight: '10px',
+    background: 'linear-gradient(45deg, #6a1b9a, #8e24aa)',
+    color: '#fff',
+    textTransform: 'capitalize',
+    boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.16)',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.2)',
+    },
+  },
+  viewRatingButton: {
+    color: '#6a1b9a',
+    border: '1px solid #6a1b9a',
+    textTransform: 'capitalize',
+    '&:hover': {
+      backgroundColor: '#f3e5f5',
+    },
+  },
+  submittedText: {
+    color: 'green',
+    marginTop: '10px',
+  },
   modal: {
     position: 'absolute',
     top: '50%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
-    width: 400,
-    backgroundColor: 'white',
-    padding: 20,
-    boxShadow: 24,
-    borderRadius: 4,
+    width: '90%',
+    maxWidth: 400,
+    backgroundColor: '#fff',
+    borderRadius: '10px',
+    boxShadow: '0px 6px 15px rgba(0, 0, 0, 0.2)',
+    padding: '20px',
+  },
+  modalTitle: {
+    marginBottom: '10px',
+    color: '#333',
+    fontWeight: 'bold',
   },
   textField: {
     margin: '20px 0',
+    '& .MuiInputBase-root': {
+      borderRadius: '8px',
+    },
+  },
+  rating: {
+    marginBottom: '20px',
+    display: 'flex',
+    justifyContent: 'center',
+  },
+  submitButton: {
+    width: '100%',
+    background: 'linear-gradient(45deg, #1e88e5, #42a5f5)',
+    color: '#fff',
+    textTransform: 'capitalize',
+    boxShadow: '0px 3px 6px rgba(0, 0, 0, 0.16)',
+    '&:hover': {
+      transform: 'scale(1.05)',
+      boxShadow: '0px 6px 12px rgba(0, 0, 0, 0.2)',
+    },
   },
 };
 
